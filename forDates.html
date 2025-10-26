@@ -16,7 +16,7 @@
     margin-bottom: 1rem;
   }
 
-  /* Toggle buttons */
+  /* Toggle */
   .toggle-container {
     display: inline-flex;
     background: #2a2b32;
@@ -75,7 +75,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Show the selected city’s timeline */
+  /* Show selected city */
   #spb:checked ~ .spb,
   #belgrade:checked ~ .belgrade {
     display: block;
@@ -88,12 +88,13 @@
 
 <div class="toggle-container">
   <input type="radio" id="spb" name="city" checked>
-  <label for="spb">St Petersburg</label>
+  <label for="spb">Saint Petersburg</label>
 
   <input type="radio" id="belgrade" name="city">
   <label for="belgrade">Belgrade</label>
 </div>
 
+<!-- оба блока должны идти ПОСЛЕ input -->
 <div class="timeline spb">
   <div class="item">
     <div class="date">10 June</div>
