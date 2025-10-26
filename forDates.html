@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Important Dates</title>
+<style>
+  body {
+    background: #1e1f25;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+    padding: 2rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Toggle buttons */
+  .toggle-container {
+    display: inline-flex;
+    background: #2a2b32;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .toggle-container input {
+    display: none;
+  }
+
+  .toggle-container label {
+    padding: 0.4rem 1.2rem;
+    cursor: pointer;
+    color: #aaa;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+
+  .toggle-container input:checked + label {
+    background: #00b7ff;
+    color: white;
+  }
+
+  /* Timeline */
+  .timeline {
+    border-left: 2px dotted #00b7ff;
+    margin-left: 1rem;
+    padding-left: 1rem;
+    display: none;
+    animation: fade 0.3s ease;
+  }
+
+  .item {
+    margin-bottom: 1rem;
+  }
+
+  .date {
+    background: #00b7ff;
+    border-radius: 12px;
+    color: #fff;
+    padding: 0.2rem 0.8rem;
+    display: inline-block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+  }
+
+  .text {
+    color: #ddd;
+    line-height: 1.3;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Show the selected city’s timeline */
+  #spb:checked ~ .spb,
+  #belgrade:checked ~ .belgrade {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<h2>Important dates</h2>
+
+<div class="toggle-container">
+  <input type="radio" id="spb" name="city" checked>
+  <label for="spb">Saint Petersburg</label>
+
+  <input type="radio" id="belgrade" name="city">
+  <label for="belgrade">Belgrade</label>
+</div>
+
+<div class="timeline spb">
+  <div class="item">
+    <div class="date">10 June</div>
+    <div class="text">Uploading case study</div>
+  </div>
+  <div class="item">
+    <div class="date">12 June</div>
+    <div class="text">Final presentation</div>
+  </div>
+</div>
+
+<div class="timeline belgrade">
+  <div class="item">
+    <div class="date">9 June</div>
+    <div class="text">Local exhibition setup</div>
+  </div>
+  <div class="item">
+    <div class="date">15 June</div>
+    <div class="text">Opening discussion</div>
+  </div>
+</div>
+
+</body>
+</html>
