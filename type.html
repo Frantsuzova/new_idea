@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Take Part as a Speaker</title>
+<style>
+  :root {
+    --bg: #ECEFFC;
+    --card-bg: #fff;
+    --text: #0f1116;
+    --muted: #5e6370;
+    --accent: #008cff;
+    --border: #cfd2e2;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    margin: 0;
+    padding: 60px 20px;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .tracks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-left: 6px solid var(--accent);
+    border-radius: 14px;
+    padding: 24px 26px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .card h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .card small {
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .card p {
+    margin: 8px 0;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+
+  .formats {
+    margin-top: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  .clock {
+    color: var(--accent);
+    font-weight: 500;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+  .highlight {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .note {
+    text-align: center;
+    color: var(--muted);
+    margin-top: 32px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 800px) {
+    .tracks {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Take Part as a Speaker</h1>
+    <p class="subtitle">There are two ways to join the AIMs seminar as a speaker:</p>
+
+    <div class="tracks">
+      <!-- Case Track -->
+      <div class="card">
+        <div>
+          <h2>Case Track <small>(without paper)</small></h2>
+          <p>Presentations of a project or exhibition.</p>
+
+          <p class="formats">Formats</p>
+          <p><strong>Large Talk:</strong> completed or mature projects 
+            <span class="clock">⏱ 20 min + 5 min Q&amp;A</span>
+          </p>
+          <p><strong>Short Talk:</strong> emerging ideas or early-stage concepts 
+            <span class="clock">⏱ 10 min + 2 min Q&amp;A</span>
+          </p>
+
+          <p>Submit title and abstract <span class="highlight">by email</span>.</p>
+        </div>
+        <p><strong>Deadline:</strong>
+          <span class="badge">05 May – Belgrade</span>
+          <span class="badge">10 June – St. Petersburg</span>
+        </p>
+      </div>
+
+      <!-- Scientific Track -->
+      <div class="card">
+        <div>
+          <h2>Scientific Track <small>(with paper)</small></h2>
+          <p>Presentations on topics aligned with the Springer CCIS book.</p>
+
+          <p class="formats">Formats</p>
+          <p><strong>Full Research:</strong> completed or advanced studies 
+            <span class="clock">⏱ 20 min + 5 min Q&amp;A</span>
+          </p>
+          <p><strong>Early Research:</strong> pilot or in-progress studies 
+            <span class="clock">⏱ 10 min + 2 min Q&amp;A</span>
+          </p>
+
+          <p>Submit via <span class="highlight">CMT</span> (<a href="#">this track pipeline</a>).</p>
+        </div>
+        <p><strong>Deadline:</strong>
+          <span class="badge">30 Mar</span>
+        </p>
+      </div>
+    </div>
+
+    <p class="note">The seminar is held offline. Online participation may be considered individually.</p>
+  </div>
+</body>
+</html>
