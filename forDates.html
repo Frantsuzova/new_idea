@@ -16,6 +16,10 @@
     margin-bottom: 1rem;
   }
 
+  .wrapper {
+    position: relative;
+  }
+
   /* Toggle */
   .toggle-container {
     display: inline-flex;
@@ -86,34 +90,35 @@
 
 <h2>Important dates</h2>
 
-<div class="toggle-container">
-  <input type="radio" id="spb" name="city" checked>
-  <label for="spb">Saint Petersburg</label>
+<div class="wrapper">
+  <div class="toggle-container">
+    <input type="radio" id="spb" name="city" checked>
+    <label for="spb">St Petersburg</label>
 
-  <input type="radio" id="belgrade" name="city">
-  <label for="belgrade">Belgrade</label>
-</div>
+    <input type="radio" id="belgrade" name="city">
+    <label for="belgrade">Belgrade</label>
+  </div>
 
-<!-- оба блока должны идти ПОСЛЕ input -->
-<div class="timeline spb">
-  <div class="item">
-    <div class="date">10 June</div>
-    <div class="text">Uploading case study</div>
+  <div class="timeline spb">
+    <div class="item">
+      <div class="date">10 June</div>
+      <div class="text">Uploading case study</div>
+    </div>
+    <div class="item">
+      <div class="date">12 June</div>
+      <div class="text">Final presentation</div>
+    </div>
   </div>
-  <div class="item">
-    <div class="date">12 June</div>
-    <div class="text">Final presentation</div>
-  </div>
-</div>
 
-<div class="timeline belgrade">
-  <div class="item">
-    <div class="date">9 June</div>
-    <div class="text">Local exhibition setup</div>
-  </div>
-  <div class="item">
-    <div class="date">15 June</div>
-    <div class="text">Opening discussion</div>
+  <div class="timeline belgrade">
+    <div class="item">
+      <div class="date">9 June</div>
+      <div class="text">Local exhibition setup</div>
+    </div>
+    <div class="item">
+      <div class="date">15 June</div>
+      <div class="text">Opening discussion</div>
+    </div>
   </div>
 </div>
 
