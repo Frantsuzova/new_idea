@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пайплайн c2-command</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0e0f12;
+      color: #f5f5f5;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 26px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #a7a7a7;
+      margin-bottom: 32px;
+    }
+
+    /* Легенда проектов */
+    .legend-wrapper {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .legend {
+      max-width: 360px;
+    }
+
+    .legend b {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    /* Навигация по фазам (сверху) */
+    .phase-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .nav-btn-phase {
+      border-radius: 999px;
+      border: 1px dashed rgba(255,255,255,0.45);
+      background: transparent;
+      color: #f5f5f5;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 5px 14px;
+      opacity: 0.6;
+      transition: background 0.2s ease, color 0.2s ease,
+                  border-color 0.2s ease, padding 0.2s ease,
+                  opacity 0.2s ease, transform 0.15s ease;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .nav-btn-phase:hover {
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-1px);
+      opacity: 0.8;
+    }
+
+    .nav-btn-phase.active {
+      padding: 8px 40px;
+      border-style: solid;
+      border-color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.10);
+      font-size: 15px;
+      opacity: 1;
+    }
+
+    .phase-arrow-btn {
+      cursor: pointer;
+      color: #9c9c9c;
+      font-size: 16px;
+      padding: 0 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+
+    .phase-arrow-btn.disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
+
+    .phase-arrow-btn:not(.disabled):hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    /* Подсказка справа */
+    .phase-hint {
+      position: absolute;
+      right: 0;
+      top: 0;
+      transform: translateY(-140%);
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      border: 1px dashed rgba(255,255,255,0.4);
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #d0d0d0;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .phase-hint.visible {
+      opacity: 1;
+    }
+
+    /* Верхняя линия и вертикальная ось */
+    .phase-top {
+      position: relative;
+      height: 48px;
+      margin-bottom: 32px;
+    }
+
+    .phase-line {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      bottom: 0;
+      height: 1px;
+      background: #d9d9d9;
+      opacity: 0.85;
+    }
+
+    .center-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: #d9d9d9;
+      opacity: 0.85;
+    }
+
+    /* Область слайдов */
+    .slider {
+      position: relative;
+    }
+
+    .slides {
+      position: relative;
+      height: 580px;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Тело фазы: две колонки */
+    .phase-body {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .phase-col {
+      position: relative;
+      padding-top: 12px;
+    }
+
+    .phase-col::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: #d9d9d9;
+      opacity: 0.7;
+    }
+
+    /* Блоки-этапы */
+    .step {
+      position: relative;
+      margin-bottom: 26px;
+      margin-left: 40px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px dashed rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.03);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .step-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-list {
+      margin: 0;
+      padding-left: 16px;
+      list-style: none;
+    }
+
+    .step-list li::before {
+      content: "→ ";
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #e3e3e3;
+      left: -18px;
+      top: 14px;
+    }
+
+    @media (max-width: 960px) {
+      .phase-body {
+        grid-template-columns: 1fr;
+      }
+      .phase-col::before {
+        left: 14px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Как работает c2-command: пайплайн проекта</h1>
+  <div class="subtitle">
+    Два типа проектов — авторский/под ключ («Лабиринты Федры») и интеграционный («Казус Мейерхольда»).
+  </div>
+
+  <!-- Легенда -->
+  <div class="legend-wrapper">
+    <div class="legend legend-click" data-popup-video="https://cdnvideo.tvspb.ru/tvspbru-uploads/2024/06/8-labirinty_site.mp4">
+        <b>«Лабиринты Федры»</b>
+        мультимедийная выставка<br>
+        июнь 2024<br>
+        Санкт-Петербургский Союз художников
+    </div>
+
+    <div class="legend legend-click" >
+      <b>«Казус Мейерхольда»</b>
+      интеграция мультимедиа в кураторский проект<br>
+      ноябрь 2024 — апрель 2025<br>
+      Санкт-Петербургский театральный музей
+    </div>
+  </div>
+
+  <!-- Навигация по фазам -->
+  <div class="phase-nav" id="phaseNav">
+    <button class="nav-btn-phase active" data-target="0">Старт</button>
+    <span class="phase-arrow-btn" data-dir="next">→</span>
+    <button class="nav-btn-phase" data-target="1">Драматургическая сборка</button>
+    <span class="phase-arrow-btn" data-dir="next">→</span>
+    <button class="nav-btn-phase" data-target="2">Интеграция</button>
+
+    <div class="phase-hint" id="phaseHint">Листайте этапы →</div>
+  </div>
+
+  <!-- Линия и вертикальная ось -->
+  <div class="phase-top">
+    <div class="phase-line"></div>
+    <div class="center-line" id="centerLine"></div>
+  </div>
+
+  <!-- Слайдер -->
+  <div class="slider">
+    <div class="slides">
+
+      <!-- ФАЗА 0 — СТАРТ -->
+      <section class="slide active" data-phase="0">
+        <div class="phase-body">
+          <!-- Федра -->
+          <div class="phase-col">
+            <div class="step">
+              <div class="step-title">Формирование идеи</div>
+              <ul class="step-list">
+                <li>первичная проработка концепции,</li>
+                <li>коммуникация со стейкхолдерами,</li>
+                <li>фиксация рамки проекта.</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Научный и кураторский анализ</div>
+              <ul class="step-list">
+                <li>определение смыслового ядра (культурологический разбор текста М. Цветаевой, 
+                    анализ мифологического и биографического контекста).</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Конструирование нарратива</div>
+              <ul class="step-list">
+                <li>создание структуры истории,</li>
+                <li>разработка принципов повествования.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Мейерхольд -->
+          <div class="phase-col">
+            <div class="step">
+              <div class="step-title">Коммуникация с музеем</div>
+              <ul class="step-list">
+                <li>обсуждение кураторской концепции,</li>
+                <li>определение зон мультимедиа,</li>
+                <li>фиксация ТЗ.</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Разработка сценария видеопроекции</div>
+              <ul class="step-list">
+                <li>анализ полученных от музея материалов,</li>
+               
+                <li>раскадровка и создание аниматика.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ФАЗА 1 — ДРАМАТУРГИЯ -->
+      <section class="slide" data-phase="1">
+        <div class="phase-body">
+          <!-- Федра -->
+          <div class="phase-col">
+            <div class="step">
+              <div class="step-title">Интерпретативный дизайн</div>
+              <ul class="step-list">
+                <li>формирование сценографического решения (реальный лабиринт как основа пространства),</li>
+                <li>выделение визуального принципа повествования (жизненные нити Федры и М.Цветаевой как графический и пространственный маркер),</li>
+                <li>проектирование логики прохождения лабиринта,</li>
+                <li>определение расположения проекций, аудиоточек и текстов в логике маршрута.</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Формирование содержательного слоя</div>
+              <ul class="step-list">
+                <li>формирование текстового слоя экспозиции,</li>
+                <li>написание экспликации с учетом необходимости понимания посетителями маршрута,</li>
+                <li>подбор стихов для аудиоточек,</li>
+                <li>выбор эпизодов для мультимедийных сцен.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Мейерхольд -->
+          <div class="phase-col">
+            <div class="step">
+              <div class="step-title">Интерпретация пространства</div>
+              <ul class="step-list">
+                <li>анализ нарратива выставки и роли 2-го зала (с мультимедийным компонентом) в экспозиции,</li>
+                <li>согласование мультимедиа-компонента с предметами и текстами.</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Работа с архивом</div>
+              <ul class="step-list">
+                <li>сбор дополнительных визуальных материалов (видео- и аудиохроника спектакля В.Мейерхольда),</li>
+                <li>выбор эпизодов видеохроники спектакля,</li>
+                <li>отбор фотографий с репетиций спектакля (труппа В.Мейерхольда),</li>
+                <li>стилистическая и техническая обработка архивных материалов,</li>
+                <li>поисх дополнительных фотоматериалов (портреты В.Мейерхольда и З.Райх),</li>
+                <li>работа с картиной К.Брюллова «Последний день Помпеи» [переписать].</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ФАЗА 2 — ИНТЕГРАЦИЯ -->
+      <section class="slide" data-phase="2">
+        <div class="phase-body">
+          <!-- Федра -->
+          <div class="phase-col">
+            <div class="step">
+              <div class="step-title">Создание мультимедийного слоя</div>
+              <ul class="step-list">
+                <li>сценарий игровых сцен и съёмки с актёрами,</li>
+                <li>звукозапись стихов,</li>
+                <li>создание пространственного звукового ряда,</li>
+                <li>синхронизация звука с прохождением лабиринта.</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Экспозиционная инсталляция</div>
+              <ul class="step-list">
+                <li>сборка конструкции лабиринта,</li>
+                <li>инсталляция света и звука,</li>
+                <li>интеграция проекций в архитектуру маршрута.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Мейерхольд -->
+          <div class="phase-col">
+            <div class="step">
+              <div class="step-title">Создание мультимедийного решения</div>
+              <ul class="step-list">
+                <li>композиция видеоряда из хроники, фото и Брюллова,</li>
+                <li>эффекты для ощущения «видений» и пересечения времён,</li>
+                <li>звуковая партитура (любовная линия, Помпеи, цитаты из спектакля, звуки стройки театра).</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-title">Финальная интеграция медиамодуля</div>
+              <ul class="step-list">
+                <li>просмотр проекции и звука в зале,</li>
+                <li>тестирование и калибровка звуковой среды,</li>
+                <li>взаимодействие с монтажной командой и дизайнером экспозиции,</li>
+                <li>внесение корректировок (три итерации),</li>
+                <li>утверждение финальной версии.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const buttons = Array.from(document.querySelectorAll('.nav-btn-phase'));
+    const arrows  = Array.from(document.querySelectorAll('.phase-arrow-btn'));
+    const centerLine = document.getElementById('centerLine');
+    const nav = document.getElementById('phaseNav');
+    const hint = document.getElementById('phaseHint');
+    const HINT_KEY = 'c2_pipeline_hint_shown';
+    let current = 0;
+
+    function updateCenterLine() {
+      const activeBtn = buttons[current];
+      if (!activeBtn) return;
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      const center = btnRect.left + btnRect.width / 2 - navRect.left;
+      centerLine.style.left = center + 'px';
+    }
+
+    function setPhase(idx) {
+      if (idx < 0 || idx >= slides.length) return;
+      current = idx;
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === current);
+      });
+
+      buttons.forEach((btn, i) => {
+        btn.classList.toggle('active', i === current);
+      });
+
+      // стрелки
+      arrows.forEach((arr, i) => {
+        if (arr.dataset.dir === 'next') {
+          if (i === 0) { // первая стрелка: между 0 и 1
+            arr.classList.toggle('disabled', current >= slides.length - 1);
+          } else { // вторая стрелка: игнорируем логику, просто отключаем на последнем
+            arr.classList.toggle('disabled', current >= slides.length - 1);
+          }
+        }
+      });
+
+      updateCenterLine();
+    }
+
+    // клики по кнопкам фаз
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = Number(btn.dataset.target || 0);
+        setPhase(t);
+      });
+    });
+
+    // стрелки: переход вперёд/назад
+    arrows.forEach((arr, i) => {
+      arr.addEventListener('click', () => {
+        if (arr.classList.contains('disabled')) return;
+        const dir = arr.dataset.dir;
+        if (dir === 'next' && current < slides.length - 1) {
+          setPhase(current + 1);
+        }
+      });
+    });
+
+    // клавиатура
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' && current < slides.length - 1) {
+        setPhase(current + 1);
+      } else if (e.key === 'ArrowLeft' && current > 0) {
+        setPhase(current - 1);
+      }
+    });
+
+    // подсказка один раз
+    if (window.localStorage && !localStorage.getItem(HINT_KEY)) {
+      hint.classList.add('visible');
+      setTimeout(() => {
+        hint.classList.remove('visible');
+        localStorage.setItem(HINT_KEY, '1');
+      }, 3000);
+    }
+
+    window.addEventListener('resize', updateCenterLine);
+
+    // старт
+    setPhase(0);
+  })();
+</script>
+
+<!-- POPUP -->
+<div id="popup" class="popup hidden">
+  <div class="popup-content">
+    <span class="popup-close">&times;</span>
+    <div id="popup-body"></div>
+  </div>
+</div>
+
+<style>
+  .legend-click { cursor: pointer; transition: opacity .2s; }
+  .legend-click:hover { opacity: .7; }
+
+  .popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 5000;
+  }
+
+  .popup.hidden {
+    display: none;
+  }
+
+  .popup-content {
+    position: relative;
+    background: #111;
+    border: 1px solid #666;
+    border-radius: 10px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90%;
+    padding: 20px;
+    overflow: auto;
+  }
+
+  .popup-close {
+    position: absolute;
+    right: 16px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 28px;
+    color: #ccc;
+  }
+
+  .popup-close:hover {
+    color: white;
+  }
+
+  .popup video, .popup img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+</style>
+
+<script>
+  const popup = document.getElementById('popup');
+  const popupBody = document.getElementById('popup-body');
+  const popupClose = document.querySelector('.popup-close');
+
+  function openVideo(src) {
+    popupBody.innerHTML = `
+      <video controls autoplay>
+        <source src="${src}" type="video/mp4" />
+      </video>`;
+    popup.classList.remove('hidden');
+  }
+
+  function openImage(src) {
+    popupBody.innerHTML = `<img src="${src}" alt="" />`;
+    popup.classList.remove('hidden');
+  }
+
+  popupClose.onclick = () => popup.classList.add('hidden');
+  popup.onclick = e => {
+    if (e.target === popup) popup.classList.add('hidden');
+  };
+
+  // подключаем к легенде Федры
+  document.querySelectorAll('.legend-click').forEach(el => {
+    el.addEventListener('click', () => {
+      const video = el.dataset.popupVideo;
+      if (video) openVideo(video);
+    });
+  });
+</script>
+
+</body>
+</html>
