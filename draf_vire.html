@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>c²-command — прототип</title>
+
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --fg:#f5f5f5;
+      --muted:rgba(245,245,245,.72);
+      --muted2:rgba(245,245,245,.55);
+      --line:rgba(255,255,255,.10);
+
+      --card:rgba(255,255,255,.03);
+      --card2:rgba(255,255,255,.06);
+      --dash:rgba(255,255,255,.20);
+
+      --btn:#fff;
+      --btnText:#0b0c10;
+
+      --roomA: rgba(255,255,255,.09);
+      --roomB: rgba(255,255,255,.04);
+      --roomC: rgba(0,0,0,.40);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif;
+      color:var(--fg);
+      background: var(--bg);
+      overflow-x:hidden;
+    }
+    a{color:inherit}
+    button{font-family:inherit}
+
+    /* ===== Header (responsive) ===== */
+    header{
+      position:fixed; top:0; left:0; right:0; height:64px;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 14px;
+      background:rgba(11,12,16,.78);
+      backdrop-filter:saturate(140%) blur(12px);
+      border-bottom:1px solid var(--line);
+      z-index:40;
+    }
+    .brand{
+      font-weight:800;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .brand small{
+      font-weight:700;
+      opacity:.70;
+      letter-spacing:.08em;
+    }
+
+    .nav{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+    .nav a{
+      font-size:14px;
+      text-decoration:none;
+      color:var(--fg);
+      opacity:.86;
+      white-space:nowrap;
+    }
+    .nav a:hover{opacity:1;text-decoration:underline}
+
+    .burger{
+      display:none;
+      width:40px;height:40px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      color:var(--fg);
+      cursor:pointer;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .burger:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.28)}
+    .burger .b{
+      width:18px;height:2px;background:rgba(255,255,255,.85);
+      position:relative;border-radius:2px;
+    }
+    .burger .b::before,.burger .b::after{
+      content:""; position:absolute; left:0; width:18px; height:2px;
+      background:rgba(255,255,255,.85); border-radius:2px;
+    }
+    .burger .b::before{top:-6px}
+    .burger .b::after{top:6px}
+
+    .nav-drawer{
+      display:none;
+      position:fixed;
+      top:64px; left:0; right:0;
+      background:rgba(11,12,16,.92);
+      backdrop-filter:saturate(140%) blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      z-index:39;
+    }
+    .nav-drawer.open{display:block}
+    .nav-drawer .inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:10px 14px 14px;
+      display:grid;
+      gap:10px;
+    }
+    .nav-drawer a{
+      display:block;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      text-decoration:none;
+      opacity:.92;
+    }
+    .nav-drawer a:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);opacity:1}
+
+    @media (max-width: 760px){
+      .nav{display:none}
+      .burger{display:flex}
+    }
+
+    /* ===== Layout ===== */
+    main{padding-top:64px}
+    section{
+      padding:84px 14px;
+      border-top:1px solid var(--line);
+      background: transparent;
+    }
+    .wrap{max-width:1100px;margin:0 auto}
+    .grid{display:grid;gap:18px}
+    .cols-2{grid-template-columns:1fr 1fr}
+    @media (max-width: 860px){ .cols-2{grid-template-columns:1fr} }
+
+    /* Buttons */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.88);
+      background:var(--btn); color:var(--btnText);
+      cursor:pointer; text-decoration:none; font-size:14px;
+      transition:transform .15s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn--ghost{
+      background:transparent;
+      color:var(--fg);
+      border-color:rgba(255,255,255,.28);
+    }
+    .btn--ghost:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.06)}
+    .btn--dark{
+      background:rgba(255,255,255,.10);
+      color:var(--fg);
+      border-color:rgba(255,255,255,.22);
+    }
+    .btn--dark:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}
+
+    /* ===== Blocks ===== */
+    .block{
+      border:1px dashed var(--dash);
+      border-radius:14px;
+      background:var(--card);
+      padding:16px;
+      transition:transform .16s ease, background .2s ease, border-color .2s ease;
+    }
+    .block:hover{
+      transform:translateY(-1px);
+      background:var(--card2);
+      border-color:rgba(255,255,255,.28);
+    }
+    .block .k{
+      font-size:12px;
+      color:rgba(255,255,255,.62);
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+
+    
+    h1{
+      margin:0;
+      font-size:clamp(30px,6vw,58px);
+      line-height:1.04;
+      letter-spacing:-.02em;
+    }
+    .lead{
+      margin:0;
+      max-width:760px;
+      color:var(--muted);
+      font-size:clamp(16px,2.2vw,18px);
+      line-height:1.5;
+    }
+    .cta{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top:10px;
+    }
+
+    /* hotspots layer */
+    .hotspots{
+      position:absolute;
+      inset:0;
+      z-index:3;
+      pointer-events:none; /* enable per hotspot */
+    }
+
+    .spot{
+      position:absolute;
+      width:min(360px, 34vw);
+      aspect-ratio: 16 / 10;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(600px 240px at 30% 30%, rgba(255,255,255,.10), transparent 62%),
+        rgba(255,255,255,.03);
+      box-shadow:0 24px 90px rgba(0,0,0,.45);
+      overflow:hidden;
+      cursor:pointer;
+      pointer-events:auto;
+      transform-style:preserve-3d;
+      opacity:.78;
+      filter: blur(.6px) saturate(.95);
+      transition:
+        transform .22s ease,
+        opacity .22s ease,
+        filter .22s ease,
+        border-color .22s ease,
+        background .22s ease;
+    }
+
+    /* “light beam” */
+    .spot::before{
+      content:"";
+      position:absolute;
+      inset:-30%;
+      background:
+        radial-gradient(500px 220px at 30% 40%, rgba(255,255,255,.16), transparent 62%),
+        radial-gradient(420px 180px at 70% 50%, rgba(255,255,255,.10), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 60%);
+      opacity:.10;
+      filter: blur(10px);
+      transform: rotate(-8deg);
+      transition: opacity .22s ease, transform .22s ease;
+      pointer-events:none;
+    }
+
+    .spot::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.38));
+      opacity:.65;
+      pointer-events:none;
+    }
+
+    .spot .label{
+      position:absolute;
+      left:14px;
+      bottom:12px;
+      right:14px;
+      z-index:2;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .spot .title{
+      margin:0;
+      font-weight:800;
+      font-size:14px;
+      letter-spacing:-.01em;
+      line-height:1.1;
+    }
+    .spot .hint{
+      font-size:12px;
+      color:rgba(255,255,255,.72);
+      white-space:nowrap;
+      opacity:.75;
+    }
+
+    .spot:hover{
+      opacity:.98;
+      filter: blur(0px) saturate(1.05);
+      border-color: rgba(255,255,255,.26);
+      background: rgba(255,255,255,.05);
+      transform: translateY(-4px) scale(1.02);
+    }
+    .spot:hover::before{
+      opacity:.30;
+      transform: rotate(-8deg) translateY(-8px);
+    }
+
+    /* place “in a room” (corners / walls) */
+    .s1{left:6%; top:22%; transform: perspective(900px) rotateY(18deg) rotateX(2deg) translateZ(0);}
+    .s2{right:6%; top:24%; transform: perspective(900px) rotateY(-18deg) rotateX(2deg) translateZ(0);}
+    .s3{left:10%; bottom:12%; transform: perspective(900px) rotateY(14deg) rotateX(-2deg) translateZ(0);}
+    .s4{right:10%; bottom:12%; transform: perspective(900px) rotateY(-14deg) rotateX(-2deg) translateZ(0);}
+    .s5{left:50%; top:54%; transform: translateX(-50%) perspective(900px) rotateX(6deg) translateZ(0); width:min(440px, 42vw);}
+
+    /* Mobile hero: stack hotspots as “gallery” */
+    @media (max-width: 760px){
+     
+      .spot{
+        width: min(520px, calc(100% - 28px));
+        aspect-ratio: 16 / 9;
+        left:50% !important;
+        right:auto !important;
+        transform: translateX(-50%) !important;
+        filter: blur(.4px);
+      }
+      .s1{top:120px !important}
+      .s2{top:250px !important}
+      .s5{top:380px !important; width: min(520px, calc(100% - 28px)) !important}
+      .s3{top:510px !important}
+      .s4{top:640px !important}
+   
+    }
+
+    /* ===== Overlay (directions details) ===== */
+    .overlay{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.62);
+      display:none; align-items:center; justify-content:center;
+      padding:14px;
+      z-index:100;
+    }
+    .overlay.open{display:flex}
+    .overlay-card{
+      width:min(900px, 100%);
+      border-radius:18px;
+      background:rgba(11,12,16,.92);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 30px 90px rgba(0,0,0,.60);
+      overflow:hidden;
+      backdrop-filter: blur(12px) saturate(130%);
+    }
+    .overlay-head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .overlay-title{margin:0;font-size:18px;letter-spacing:-.01em}
+    .overlay-kicker{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:6px}
+    .overlay-close{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.08);
+      color:var(--fg);
+      border-radius:999px;
+      padding:8px 12px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .overlay-close:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35)}
+    .overlay-body{
+      padding:14px 16px 18px;
+      color:rgba(255,255,255,.86);
+      line-height:1.6;
+      font-size:14px;
+    }
+    .overlay-body ul{margin:10px 0 0;padding-left:18px}
+    .overlay-body li{margin:6px 0}
+
+    /* ===== Reviews / Partners (mobile fixes) ===== */
+    .slider{
+      position:relative;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px dashed var(--dash);
+      background:var(--card);
+    }
+    .slides{
+      display:flex;
+      transition:transform .35s ease;
+      will-change:transform;
+    }
+    .slide{
+      min-width:100%;
+      padding:16px;
+    }
+    .quote{
+      border-left:3px solid rgba(255,255,255,.22);
+      padding-left:12px;
+      color:rgba(255,255,255,.88);
+      line-height:1.6;
+    }
+    .quote .who{margin-top:10px;color:rgba(255,255,255,.62);font-size:13px}
+    .slider-controls{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 12px;
+      border-top:1px solid rgba(255,255,255,.10);
+    }
+    .dots{display:flex;gap:6px;align-items:center;justify-content:center;flex:1}
+    .dot{
+      width:8px;height:8px;border-radius:99px;
+      background:rgba(255,255,255,.24);
+      border:1px solid rgba(255,255,255,.18);
+      cursor:pointer;
+      transition:transform .15s ease, background .2s ease;
+    }
+    .dot.active{background:rgba(255,255,255,.75);transform:scale(1.05)}
+    .slider-btn{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.06);
+      color:var(--fg);
+      border-radius:999px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-size:14px;
+      user-select:none;
+      min-width:40px;
+      min-height:40px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .slider-btn:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.32)}
+
+    .logos{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+    .logo{
+      height:48px;border-radius:10px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    @media (max-width: 860px){ .logos{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width: 420px){
+      .logos{grid-template-columns:repeat(1,1fr)}
+      .logo{height:44px}
+    }
+
+    /* ===== Seminar placeholder ===== */
+    .photo-ph{
+      height:280px;
+      border-radius:14px;
+      border:1px dashed var(--dash);
+      background:
+        radial-gradient(700px 260px at 30% 30%, rgba(255,255,255,.08), transparent 60%),
+        rgba(255,255,255,.03);
+    }
+    @media (max-width: 860px){ .photo-ph{height:220px} }
+
+    /* ===== Team ===== */
+    .team-grid{
+      display:grid;
+      grid-template-columns:repeat(7, 1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    .team-ph{
+      aspect-ratio: 1 / 1;
+      border-radius:12px;
+      border:1px dashed var(--dash);
+      background:rgba(255,255,255,.04);
+      transition: background .2s ease, transform .16s ease;
+    }
+    .team-ph:hover{background:rgba(255,255,255,.06);transform:translateY(-1px)}
+    @media (max-width: 980px){ .team-grid{grid-template-columns:repeat(4,1fr)} }
+    @media (max-width: 560px){ .team-grid{grid-template-columns:repeat(2,1fr)} }
+
+    /* ===== Contact modal (mobile-ready) ===== */
+    .modal{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      background:rgba(0,0,0,.62);
+      z-index:120;
+    }
+    .modal.open{display:flex}
+    .modal-card{
+      width:min(760px, 100%);
+      border-radius:18px;
+      background:rgba(11,12,16,.94);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 30px 90px rgba(0,0,0,.60);
+      backdrop-filter: blur(12px) saturate(130%);
+      overflow:hidden;
+      max-height: calc(100dvh - 28px);
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      flex:0 0 auto;
+    }
+    .modal-title{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.70);
+    }
+    .modal-body{
+      padding:12px 14px 16px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .field{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      color:var(--fg);
+      font-size:14px;
+      outline:none;
+    }
+    .field::placeholder{color:rgba(255,255,255,.45)}
+    .field:focus{border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.08)}
+    textarea.field{resize:vertical;min-height:120px}
+
+    .form-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    @media (max-width: 420px){
+      .form-actions{flex-direction:column;align-items:stretch}
+      .form-actions .btn{width:100%}
+    }
+
+    footer{
+      padding:24px 14px;
+      border-top:1px solid var(--line);
+      color:rgba(255,255,255,.55);
+      font-size:13px;
+    }
+
+    /* ===== Pipeline (scoped) ===== */
+    .pipeline-wrap{
+      margin-top:18px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      overflow:hidden;
+      background:#0b0c10;
+      box-shadow:0 18px 70px rgba(0,0,0,.45);
+    }
+    .pipeline{
+      max-width:1100px;
+      margin:0 auto;
+      padding:34px 14px 44px;
+      box-sizing:border-box;
+    }
+
+    .pipeline h1{
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: 550;
+      text-align: center;
+      letter-spacing:-.01em;
+    }
+    .pipeline .subtitle{
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255,255,255,.62);
+      margin-bottom: 18px;
+      line-height: 1.45;
+      padding:0 6px;
+    }
+
+    .pipeline .project-nav{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin:18px 0 20px;
+      flex-wrap:wrap;
+    }
+
+    .pipeline .project-btn{
+      border-radius:999px;
+      border:1px dashed rgba(255,255,255,0.45);
+      background:transparent;
+      color:#f5f5f5;
+      cursor:pointer;
+      font-size:13px;
+      padding:7px 16px;
+      opacity:0.70;
+      transition: background 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      white-space:nowrap;
+      user-select:none;
+    }
+    .pipeline .project-btn:hover{
+      background:rgba(255,255,255,0.06);
+      transform:translateY(-1px);
+      opacity:0.92;
+    }
+    .pipeline .project-btn.active{
+      border-style:solid;
+      border-color:rgba(255,255,255,0.9);
+      background:rgba(255,255,255,0.10);
+      opacity:1;
+    }
+
+    .pipeline .project-card{
+      margin:0 auto 18px;
+      max-width:760px;
+      border:1px dashed rgba(255,255,255,0.45);
+      background:rgba(255,255,255,0.03);
+      border-radius:10px;
+      padding:14px 16px;
+      box-sizing:border-box;
+    }
+    .pipeline .title-row{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .pipeline .project-name{
+      font-size:16px;
+      font-weight:750;
+      margin:0;
+      letter-spacing:0.01em;
+    }
+    .pipeline .project-type{
+      font-size:11px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      color:#cfcfcf;
+      opacity:0.85;
+      border:1px dashed rgba(255,255,255,0.35);
+      border-radius:999px;
+      padding:3px 10px;
+      white-space:nowrap;
+    }
+    .pipeline .project-meta{
+      font-size:13px;
+      line-height:1.35;
+      color:#cfcfcf;
+      opacity:0.9;
+    }
+    .pipeline .project-media{
+      margin-top:10px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      user-select:none;
+      font-size:12px;
+      color:#d8d8d8;
+      opacity:0.9;
+      border:1px dashed rgba(255,255,255,0.35);
+      border-radius:999px;
+      padding:5px 10px;
+      transition: opacity 0.2s ease, transform 0.15s ease, background 0.2s ease;
+    }
+    .pipeline .project-media:hover{
+      opacity:1;
+      transform:translateY(-1px);
+      background:rgba(255,255,255,0.06);
+    }
+
+    .pipeline .phase-nav{
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      gap:6px;
+      margin-bottom:18px;
+      position:relative;
+      flex-wrap:wrap;
+    }
+    .pipeline .nav-btn-phase{
+      border-radius:999px;
+      border:1px dashed rgba(255,255,255,0.45);
+      background:transparent;
+      color:#f5f5f5;
+      cursor:pointer;
+      font-size:13px;
+      padding:5px 14px;
+      opacity:0.65;
+      transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
+      user-select:none;
+
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      line-height:1.15;
+      min-height:34px;
+      white-space:nowrap;
+    }
+    .pipeline .nav-btn-phase:hover{
+      background:rgba(255,255,255,0.06);
+      transform:translateY(-1px);
+      opacity:0.86;
+    }
+    .pipeline .nav-btn-phase.active{
+      border-style:solid;
+      border-color:rgba(255,255,255,0.9);
+      background:rgba(255,255,255,0.10);
+      opacity:1;
+      font-weight:700;
+    }
+
+    .pipeline .phase-arrow-btn{
+      cursor:pointer;
+      color:#9c9c9c;
+      font-size:16px;
+      padding:0 4px;
+      opacity:0.7;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+      user-select:none;
+      white-space:nowrap;
+
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:34px;
+    }
+    .pipeline .phase-arrow-btn.disabled{opacity:0.25;cursor:default}
+    .pipeline .phase-arrow-btn:not(.disabled):hover{opacity:1;transform:translateY(-1px)}
+
+    .pipeline .phase-top{ position:relative; height:44px; margin-bottom:14px; }
+    .pipeline .phase-line{ position:absolute; left:10%; right:10%; bottom:0; height:1px; background:#d9d9d9; opacity:0.75; }
+    .pipeline .center-line{ position:absolute; top:0; bottom:0; width:1px; background:#d9d9d9; opacity:0.75; }
+
+    /* IMPORTANT: remove empty space */
+    .pipeline .slides{ position:relative; min-height:auto; }
+    .pipeline .slide{ position:static; display:none; }
+    .pipeline .slide.active{ display:block; }
+
+    .pipeline .phase-body{
+      position:relative;
+      max-width:840px;
+      margin:0 auto;
+      padding:6px 0 0;
+    }
+    .pipeline .phase-body::before{
+      content:"";
+      position:absolute;
+      left:16px;
+      top:0;
+      bottom:0;
+      width:1px;
+      background:#d9d9d9;
+      opacity:0.55;
+    }
+
+    .pipeline .step{
+      position:relative;
+      margin-bottom:18px;
+      margin-left:36px;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px dashed rgba(255,255,255,0.45);
+      background:rgba(255,255,255,0.03);
+      font-size:13px;
+      line-height:1.45;
+      transition: transform 0.16s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .pipeline .step:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,0.06);
+      border-color:rgba(255,255,255,0.70);
+      box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    }
+    .pipeline .step-title{ font-weight:700; margin-bottom:6px; }
+
+    .pipeline .step-list{
+      margin:0;
+      padding-left:16px;
+      list-style:none;
+    }
+    .pipeline .step-list li::before{ content:"→ "; }
+
+    /* arrow marker on axis */
+    .pipeline .step::before{
+      content:"";
+      position:absolute;
+      left:-20px;
+      top:18px;
+      width:0;height:0;
+      border-top:5px solid transparent;
+      border-bottom:5px solid transparent;
+      border-left:7px solid #e3e3e3;
+      opacity:0.95;
+      transition: transform .16s ease;
+    }
+    /* small horizontal stroke (desktop only) */
+    .pipeline .step::after{
+      content:"";
+      position:absolute;
+      left:-14px;
+      top:22px;
+      height:1px;
+      width:14px;
+      background:rgba(217,217,217,0.65);
+      transition: width .18s ease, opacity .2s ease;
+      opacity:0.65;
+    }
+    .pipeline .step:hover::after{ width:22px; opacity:0.92; }
+    .pipeline .step:hover::before{ transform:translateX(1px); }
+
+    /* pipeline popup */
+    .pipeline-popup{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.75);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      z-index:5000;
+    }
+    .pipeline-popup.hidden{ display:none; }
+    .pipeline-popup-content{
+      position:relative;
+      background:#0b0c10;
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:14px;
+      max-width:900px;
+      width:100%;
+      max-height: calc(100dvh - 28px);
+      padding:14px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pipeline-popup-close{
+      position:sticky;
+      top:0;
+      margin-left:auto;
+      cursor:pointer;
+      font-size:26px;
+      color:#ccc;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:38px;height:38px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+    }
+    .pipeline-popup-close:hover{ color:#fff; background:rgba(255,255,255,.10); border-color:rgba(255,255,255,.28) }
+    .pipeline-popup video, .pipeline-popup img{
+      width:100%;
+      height:auto;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:#000;
+    }
+
+    @media (max-width: 560px){
+      section{padding:72px 14px}
+      .pipeline{ padding:28px 12px 40px; }
+      .pipeline h1{ font-size:22px; }
+      .pipeline .subtitle{ font-size:12px; margin-bottom:14px; }
+
+      /* 2-line nav, same heights */
+      .pipeline .phase-nav{
+        display:grid;
+        grid-template-columns: 1fr auto 1fr;
+        grid-template-rows: auto auto;
+        align-items:stretch;
+        justify-items:center;
+        column-gap:6px;
+        row-gap:8px;
+        margin-bottom:16px;
+      }
+      .pipeline .phase-nav .nav-btn-phase[data-target="0"]{ grid-column:1; grid-row:1; }
+      .pipeline .phase-nav .phase-arrow-btn:nth-of-type(1){ grid-column:2; grid-row:1; }
+      .pipeline .phase-nav .nav-btn-phase[data-target="1"]{ grid-column:3; grid-row:1; }
+      .pipeline .phase-nav .phase-arrow-btn:nth-of-type(2){ grid-column:2; grid-row:2; }
+      .pipeline .phase-nav .nav-btn-phase[data-target="2"]{ grid-column:3; grid-row:2; }
+
+      .pipeline .nav-btn-phase{
+        width:100%;
+        font-size:11.5px;
+        padding:7px 10px;
+        min-height:40px;
+        white-space:normal;
+        border-radius:18px;
+      }
+      .pipeline .nav-btn-phase.active{
+        font-size:11.5px;
+        padding:7px 10px;
+        min-height:40px;
+      }
+      .pipeline .phase-arrow-btn{
+        min-height:40px;
+        font-size:14px;
+        padding:0 2px;
+        opacity:0.6;
+      }
+      .pipeline .phase-nav::before{
+        content:"";
+        grid-column:1;
+        grid-row:2;
+        width:100%;
+        min-height:40px;
+      }
+
+      .pipeline .phase-top{ display:none; }
+      .pipeline .step::after{ display:none; }
+      .pipeline .phase-body::before{ left:12px; }
+      .pipeline .step{ margin-left:30px; font-size:12.5px; }
+      .pipeline .step::before{ left:-18px; }
+
+      /* clients section: ensure spacing feels “designed” */
+      #clients .block{padding:14px}
+      .slide{padding:14px}
+      .slider-controls{padding:10px}
+
+      #clients .wrap.grid > .block { min-width: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .spot,.block,.btn,.slides{transition:none}
+      .spot::before{transition:none}
+    }
+
+    /*-----------------------*/
+    .container{
+      position:relative;
+  width: min(1100px, calc(100% - 28px));
+  margin: 0 auto;
+  transform:none;
+  top:auto;
+  left:auto;
+        display: flex;
+        
+        justify-content: center;
+        flex-wrap: wrap;
+        align-content: center;
+        align-items: center;
+        user-select: none;
+      }
+.clock{
+  display: flex;
+        position: relative;
+        flex-direction: column;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        margin: 5px auto;
+      
+        transform: translateY(-10%);
+}
+.beam{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  height:260px;
+  pointer-events:none;
+  z-index:1;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,252,252,.55),
+      rgba(0,252,252,.18),
+      transparent 70%
+    );
+
+   height:320px;
+   clip-path: polygon(
+    50% 65%,
+    -20% 0%,
+    120% 0%
+  );
+
+  filter:
+    blur(6px)
+    drop-shadow(0 0 30px rgba(0,252,252,.45));
+}
+.holo{
+  position: absolute;
+  bottom: 25%;
+  filter: blur(1.5px);
+} 
+.t-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 5px;
+  position: relative;
+  width: 250px;
+  border-radius: 50%;
+  opacity: 1;
+  color:rgba(0, 252, 252, .95);
+  text-shadow: 1px 1px 8px #00fcfc99;
+  z-index: 3;
+}
+
+.t-left {
+  display: flex;
+  position: relative;
+  height: 380px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 400;
+  font-size: 65px;
+  margin: 5px auto;
+  text-align: center;
+  justify-content: center;
+  letter-spacing: 5px;
+  color:rgba(0, 252, 252, .81);
+  text-shadow: 2px 1px 8px #00fcfcf1;
+  animation: animate 1s linear infinite;
+  z-index: 3;
+  backdrop-filter: blur(1px);
+  backface-visibility: hidden;
+}
+.t-left:before, .t-left:after {
+  transform: perspective(62px) rotateX(335deg) rotate(90deg) translateZ(20px);
+  position: absolute;
+  content: "";
+  animation: holoFocal2 600s linear infinite reverse;
+  top: 76%;
+  background:repeating-linear-gradient(180deg, rgb(255, 255, 255) 0%, #131325 1%, #000000 2%, rgba(62, 150, 255, .71) 1%, #171717 1%, #000000 2%, transparent 1%);
+  background-color: rgba(0,255,255, .71);
+  width: 110px;
+  height: 110px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  text-rendering: optimizeLegibility;
+  z-index: -1;
+  overflow: hidden;
+  left: 26%;
+  box-shadow: inset 2px 1px 8px black,
+    inset -1px -2px 8px black,
+    inset -4px 0px 15px 2px black,
+    inset 4px 0px 8px 1px black;
+  background-blend-mode: multiply;
+  background-size:contain;
+  opacity: .1;
+}
+.t-left::before {
+  animation: holoFocal 500s linear infinite reverse;
+  opacity: 1;
+  background:repeating-linear-gradient(180deg, rgb(255, 255, 255) 0%, #131325 1%, #1b1b1d 1%, #000000 2%, #5d5d74 2%, #231f1f 3%, #171717 4%, rgba(62, 150, 255, .7) 5%, #000000 5%);
+  background-position-x: center;
+  object-fit: contain;
+}
+.t-left:after {
+  animation: holoFocal 300s linear infinite alternate-reverse;
+  opacity: 0.1;
+  filter: blur(0px);
+  background-position-x: center;
+  object-fit: contain;
+}
+
+.time-ctrl-container {
+  display: flex;
+  margin: 15px;
+  width: 279px;
+}
+.time-ctrl {
+  display: flex;
+  position: relative;
+  width: 100%;
+  justify-content: space-evenly;
+  height: 50px;
+  left: 4px;
+}
+
+
+
+
+.holo {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 3;
+  width: 150px;
+  height: 13px;
+  margin: -5px auto 0;
+  background-color: rgba(0, 252, 252, 1);
+  border-radius: 100%;
+  transform: perspective(100px) rotateX(313deg);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  backdrop-filter: blur(1px);
+  overflow: hidden;
+  outline: 3px double rgba(218, 165, 32, 1);
+  outline-offset: 6px;
+  box-shadow:
+    0 -1px 5px rgba(0, 252, 252, .15),
+    0 -1px 2px rgba(0, 252, 252, .5),
+    0 -1px 5px rgba(0, 252, 252, .15),
+    0 -2px 3px rgba(0, 252, 252, .5),
+    0 -3px 4px rgba(0, 252, 252, .5),
+    0 -4px 6px rgba(0, 252, 252, .5),
+    0 -5px 7px rgba(0, 252, 252, .65),
+    0 -7px 10px rgba(0, 252, 252, .65),
+    0 -10px 15px rgba(0, 252, 252, .65),
+    0 -15px 20px rgba(0, 252, 252, .65),
+    0 -20px 25px rgba(0, 252, 252, .65),
+    0 -35px 30px rgba(139, 0, 139, .5),
+    0 -55px 35px rgba(139, 0, 139, .5),
+    0 -55px 5px rgba(139, 252, 252, .031),
+    0 -75px 25px rgba(139, 0, 252, .15);
+}
+.holo:before {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: -5%;
+  content: "";
+  height: 25px;
+  border-radius: 100%;
+  filter: blur(1.5px);
+  opacity: .8;
+  z-index: -3;
+  outline: 3px double black;
+  outline-offset: -5px;
+  background:repeating-linear-gradient(90deg, rgb(255, 255, 255) 0%, #131325 1%, #1b1b1d 1%, #000000 2%, #5d5d74 2%, #231f1f 3%, #171717 4%, rgb(62, 150, 255) 5%, #000000 51%);
+  box-shadow: 5px 5px 5px 5px rgb(252, 139, 139);
+}
+.holo:after {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  content: "";
+  height: 55px;
+  background-color: rgba(0, 252, 252, .57);
+  border-radius: 100%;
+  filter: blur(1.5px);
+  background: repeating-conic-gradient(from var(--a), #00c9c9 0%, #00c9c9 30%, transparent 0%, transparent 50%, #00c9c9 10%);
+  opacity: .7;
+  animation: animate2 4s linear infinite;
+  outline: 3px double black;
+  outline-offset: -5px;
+}
+.holo-border {
+  position: absolute;
+  left: 13px;
+  top: -25%;
+  content: "";
+  height: 50px;
+  width: 90%;
+  transform: perspective(100px) rotateX(352deg);
+  border-radius: 100%;
+  filter: blur(1.5px);
+  opacity: 1;
+  z-index: -3;
+  border: 4.5px solid teal;
+  background-color: rgba(0, 147, 252, .21);
+  background: repeating-linear-gradient(72deg, rgb(255, 255, 255) 0%, #131325 1%, #1b1b1d 15%, #000000 2%, #5d5d74 2%, #231f1f 3%, hsl(0, 0%, 9%) 4%, rgb(62, 150, 255) 54%, #000000 44%);
+  animation: holoFocal2 1.5s ease-in infinite alternate-reverse;
+  transform-style: preserve-3d;
+  box-shadow: inset 2px 0px 18px rgba(0, 147, 252, .51), 
+    inset -6px -6px 18px rgba(255, 255, 255, .41), 
+    inset -1px -6px 2px rgba(55, 125, 55, .61), 
+    1px 15px 65px 45px rgba(0, 252, 252, .7);
+  outline: 1px double cyan;
+}
+.holo-border:before {
+  position: absolute;
+  content: "";
+  background: rgba(0, 252, 252, .4);
+  top: -40%;
+  width: 17%;
+  z-index: -3;
+  opacity: 1;
+  height: 50px;
+  transform: rotate3d(28, 5, 12, 91deg);
+  border-radius: 50%;
+  right: 3px;
+}
+.holo-border:after {
+  position: absolute;
+  content: "";
+  background: rgba(0, 252, 252, .4);
+  left: 7px;
+  top: -42%;
+  width: 16%;
+  z-index: -3;
+  opacity: 1;
+  height: 50px;
+  transform: rotate3d(11, 10, 12, 203deg);
+  border-radius: 50%;
+}
+
+@property --a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+/* KEYFRAMES SECTION */
+@keyframes animate {
+  0% {
+    --a: 0deg;
+    opacity: .65;
+  } 25% {
+    --a: 45deg;
+    opacity: .66;
+    text-shadow: 2px 0px 8px #17fffff1;
+  } 35% {
+    --a: 45deg;
+    opacity: .7;
+    text-shadow: 2px 0px 8px #17fffff1;
+  } 50% {
+    --a: -13deg;
+    opacity: .67;
+    text-shadow: 2px 2px 8px #17fffff1;
+  } 65% {
+    --a: 45deg;
+    opacity: .7;
+    text-shadow: 2px 0px 8px #17fffff1;
+  } 75% {
+    --a: -45deg;
+    opacity: .66;
+    text-shadow: 2px 1px 8px #00fcfcf1;
+  } 100% {
+    --a: 360deg;
+    opacity: .65;
+    text-shadow: 2px 0px 8px #00fcfcf1;
+  }
+}
+
+@keyframes animate2 {
+  0% {
+    --a: 0deg;
+    opacity: .65;
+  } 100% {
+    --a: 360deg;
+    opacity: .65;
+  }
+}
+@keyframes slideup {
+  0% { background-position: 0 0; opacity: .8; }
+  50% { background-position: 0 -500px; opacity: .7;}
+  100% { background-position: 0 -900px; opacity: .6;}
+}
+@keyframes holoFocal {
+  0% {
+    opacity: .15;
+    background-position: 0 0;
+  } 50% {
+    opacity: .2;
+    background-position: 0 -250px;
+  } 100% {
+    opacity: .15;
+    background-position: 0 -500px;
+  }
+}
+@keyframes holoFocal2 {
+  0% {
+    --a: 0deg;
+    opacity: .2;
+  } 100% {
+    --a: 360deg;
+    opacity: .30;
+  }
+}
+
+.hero {
+  min-height: 400px;          /* или 100svh если хочешь полноэкранный hero */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+
+
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">c2-command <small>prototype</small></div>
+
+    <nav class="nav" aria-label="Навигация">
+      <a href="#about">О нас</a>
+      <a href="#pipeline">Пайплайн</a>
+      <a href="#clients">Отзывы</a>
+      <a href="#seminar">Семинар</a>
+      <a href="#team">Команда</a>
+      <a href="#footer">Контакты</a>
+    </nav>
+
+    <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false">
+      <span class="b"></span>
+    </button>
+  </header>
+
+  <div class="nav-drawer" id="navDrawer">
+    <div class="inner">
+      <a href="#about" class="navlink">О нас</a>
+      <a href="#pipeline" class="navlink">Пайплайн</a>
+      <a href="#clients" class="navlink">Отзывы</a>
+      <a href="#seminar" class="navlink">Семинар</a>
+      <a href="#team" class="navlink">Команда</a>
+      <a href="#footer" class="navlink">Контакты</a>
+    </div>
+  </div>
+
+  <!-- Services overlay -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="overlay-card" role="dialog" aria-modal="true" aria-label="Направление">
+      <div class="overlay-head">
+        <div>
+          <h3 class="overlay-title" id="overlayTitle">—</h3>
+          <div class="overlay-kicker" id="overlayKicker">—</div>
+        </div>
+        <button class="overlay-close" id="overlayClose">Закрыть</button>
+      </div>
+      <div class="overlay-body" id="overlayBody"></div>
+    </div>
+  </div>
+
+  <!-- Contact modal -->
+  <div class="modal" id="contactModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Связаться">
+      <div class="modal-head">
+        <div class="modal-title">Связаться</div>
+        <button class="overlay-close" id="contactClose">Закрыть</button>
+      </div>
+      <div class="modal-body">
+        <form class="grid" onsubmit="return false;">
+          <input class="field" placeholder="Имя" />
+          <input class="field" placeholder="Email" />
+          <input class="field" placeholder="Организация / музей (опционально)" />
+          <textarea class="field" placeholder="Коротко: задача, площадка, сроки"></textarea>
+
+          <div class="form-actions">
+            <button class="btn" type="button" id="sendBtn">Отправить</button>
+            <button class="btn btn--ghost" type="button" id="contactCancel">Отмена</button>
+          </div>
+
+          <div style="color:rgba(255,255,255,.55);font-size:12px;line-height:1.5">
+            (Плейсхолдер: подключим отправку формы позже.)
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="container">
+        <div class="clock">
+          <div class="beam"></div>
+          <div class="t-container">
+            <div class="t-left" id="time-left">УТП + подзаг</div>
+          </div>
+          <div class="time-ctrl-container">
+            <div class="time-ctrl">
+              <button > связаться</button>
+              <div class="holo"> </div>
+              <div class="holo-border"></div>
+              <button >смотреть процесс</button>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <div class="wrap grid cols-2">
+        <div class="block">
+          <div class="k">о нас и целях</div>
+          <p style="color:rgba(255,255,255,.82);line-height:1.65;margin:0">
+            c²-command проектирует и реализует мультимедийные решения для музеев на стыке искусства, технологий и исследовательского подхода.
+            Наша цель — чтобы экспозиция становилась осмысленным путешествием: вовлекала, направляла внимание и помогала прожить историю,
+            а не просто «посмотреть» её.
+          </p>
+        </div>
+
+        <div class="block">
+          <div class="k">что мы делаем</div>
+          <ul style="margin:0;padding-left:18px;line-height:1.75;color:rgba(255,255,255,.82)">
+            <li>Видеопроекции и пространственная режиссура</li>
+            <li>Аудиодизайн: звуковые инсталляции, маршруты, аудиоточки</li>
+            <li>Интерфейсы и AR: приложения, панели, интерактивные сценарии</li>
+            <li>ML/ИИ: интерактив, персонализация, работа с данными</li>
+            <li>Графический дизайн: визуальные системы и носители экспозиции</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="k">Процесс, если коротко</div>
+          <p style="color:rgba(255,255,255,.78);line-height:1.65;margin:0">
+            Диагностика экспозиции → драматургия и сценарии → прототипирование → производство контента и софта →
+            монтаж и запуск → сопровождение и обучение команды площадки.
+          </p>
+        </div>
+
+        <div class="block">
+          <div class="k">формат сотрудничества</div>
+          <p style="color:rgba(255,255,255,.78);line-height:1.65;margin:0">
+            Ведём проект целиком: от концепции и прототипов до реализации на площадке, с единым окном коммуникации и прозрачной сборкой этапов.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pipeline -->
+    <section id="pipeline">
+      <div class="wrap">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+          <div>
+            <div style="color:rgba(255,255,255,.62);letter-spacing:.1em;text-transform:uppercase;font-size:12px;margin-bottom:8px">пайплайн</div>
+            <div style="font-weight:800;font-size:26px;letter-spacing:-.01em">Как идёт процесс</div>
+            <div style="color:rgba(255,255,255,.64);margin-top:8px;line-height:1.55">
+              Два формата работы: авторская разработка «под ключ» и интеграция мультимедиа в кураторский проект.
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-wrap">
+          <div class="pipeline" id="pipelineRoot">
+            <h1>Как работает c2-command: пайплайн проекта</h1>
+            <div class="subtitle">
+              Ниже представлены два пайплайна: авторская разработка экспозиции «под ключ» и интеграция мультимедиа в кураторский проект.
+            </div>
+
+            <div class="project-nav" id="pipelineProjectNav">
+              <button class="project-btn active" data-project="0">«Лабиринты Федры»</button>
+              <button class="project-btn" data-project="1">«Казус Мейерхольда»</button>
+            </div>
+
+            <div class="project-card" id="pipelineProjectCard"></div>
+
+            <div class="phase-nav" id="pipelinePhaseNav">
+              <button class="nav-btn-phase active" data-target="0">Старт</button>
+              <span class="phase-arrow-btn" data-dir="next">→</span>
+              <button class="nav-btn-phase" data-target="1">Драматургическая сборка</button>
+              <span class="phase-arrow-btn" data-dir="next">→</span>
+              <button class="nav-btn-phase" data-target="2">Интеграция</button>
+            </div>
+
+            <div class="phase-top">
+              <div class="phase-line"></div>
+              <div class="center-line" id="pipelineCenterLine"></div>
+            </div>
+
+            <div class="slides" id="pipelineSlides">
+              <section class="slide active" data-phase="0">
+                <div class="phase-body" id="pipelinePhaseBody0"></div>
+              </section>
+
+              <section class="slide" data-phase="1">
+                <div class="phase-body" id="pipelinePhaseBody1"></div>
+              </section>
+
+              <section class="slide" data-phase="2">
+                <div class="phase-body" id="pipelinePhaseBody2"></div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <div id="pipelinePopup" class="pipeline-popup hidden" aria-hidden="true">
+          <div class="pipeline-popup-content" role="dialog" aria-modal="true" aria-label="Медиа проекта">
+            <span class="pipeline-popup-close" id="pipelinePopupClose">&times;</span>
+            <div id="pipelinePopupBody"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews + Partners -->
+    <section id="clients">
+      <div class="wrap grid cols-2">
+        <div class="block">
+          <div class="k">отзывы</div>
+
+          <div class="slider" id="reviews">
+            <div class="slides" id="reviewSlides">
+              <div class="slide">
+                <div class="quote">
+                  «…если с помощью мультимедийных технологий превращать выставочное пространство в театр,
+                  то зрителю удаётся выйти за рамки и прожить историю как соучастник.»
+                  <div class="who">— отзыв (плейсхолдер 1)</div>
+                </div>
+              </div>
+
+              <div class="slide">
+                <div class="quote">
+                  «Точная драматургия и аккуратная интеграция медиа: пространство начинает работать как единый рассказ.»
+                  <div class="who">— отзыв (плейсхолдер 2)</div>
+                </div>
+              </div>
+
+              <div class="slide">
+                <div class="quote">
+                  «Команда собрала процесс от идеи до запуска, оставив понятную логику эксплуатации для площадки.»
+                  <div class="who">— отзыв (плейсхолдер 3)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="slider-controls">
+              <button class="slider-btn" type="button" id="prevReview" aria-label="Предыдущий отзыв">←</button>
+              <div class="dots" id="reviewDots" aria-label="Индикатор слайдов"></div>
+              <button class="slider-btn" type="button" id="nextReview" aria-label="Следующий отзыв">→</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="k">Партнёры и площадки</div>
+          <div class="logos" style="margin-top:14px">
+            <div class="logo"></div><div class="logo"></div><div class="logo"></div>
+            <div class="logo"></div><div class="logo"></div><div class="logo"></div>
+          </div>
+          <div style="color:rgba(255,255,255,.55);margin-top:12px;font-size:13px;line-height:1.5">
+            Заглушки под логотипы.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seminar -->
+    <section id="seminar">
+      <div class="wrap grid cols-2">
+        <div class="block">
+          <div class="k">семинар</div>
+          <p style="color:rgba(255,255,255,.78);line-height:1.7;margin:0">
+            AIMs — международный семинар о том, как цифровые инструменты меняют выставки и зрительский опыт:
+            сценография, сторителлинг, интерактивные маршруты, интерфейсы, звук и работа с данными.
+          </p>
+          <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn btn--dark" href="https://aims-seminar.space/" target="_blank" rel="noopener">Перейти на сайт семинара</a>
+          </div>
+        </div>
+
+        <div class="photo-ph" aria-label="Фото-заглушка"></div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section id="team">
+      <div class="wrap">
+        <div class="block">
+          <div class="k">команда</div>
+          <p style="color:rgba(255,255,255,.78);line-height:1.7;margin:0">
+            Продюсирование, режиссура и сценарии, дизайн, инженерия, разработка, звук, постпродакшн.
+          </p>
+
+          <div class="team-grid" aria-label="Заглушки под фотографии команды">
+            <div class="team-ph"></div>
+            <div class="team-ph"></div>
+            <div class="team-ph"></div>
+            <div class="team-ph"></div>
+            <div class="team-ph"></div>
+            <div class="team-ph"></div>
+            <div class="team-ph"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer feedback -->
+    <section id="footer" style="padding:54px 14px">
+      <div class="wrap">
+        <div class="block" style="background:rgba(255,255,255,.04)">
+          <div class="k">обратная связь</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:800;font-size:18px;letter-spacing:-.01em">Есть задача или идея?</div>
+              <div style="color:rgba(255,255,255,.66);margin-top:6px;line-height:1.6">
+                Напишите — мы поможем собрать её в понятный процесс и аккуратно встроить мультимедиа в историю.
+              </div>
+            </div>
+            <button class="btn" type="button" data-open-contact>Связаться</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">© c²-command — кликабельный прототип</div>
+    </footer>
+  </main>
+
+  <script>
+    // ===== Mobile nav =====
+    const burger = document.getElementById('burger');
+    const navDrawer = document.getElementById('navDrawer');
+
+    function closeDrawer(){
+      navDrawer.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    }
+    burger?.addEventListener('click', () => {
+      const open = navDrawer.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.querySelectorAll('.navlink').forEach(a => {
+      a.addEventListener('click', () => closeDrawer());
+    });
+    window.addEventListener('scroll', () => closeDrawer(), {passive:true});
+
+    // ===== Services overlay content =====
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayKicker = document.getElementById('overlayKicker');
+    const overlayBody = document.getElementById('overlayBody');
+    const overlayClose = document.getElementById('overlayClose');
+
+    const DIR = {
+      video: {
+        title: "Видеопроекции",
+        kicker: "пространственная режиссура",
+        body: `
+          <div>Проекция как часть экспозиционной драматургии: ритм, масштаб, точки внимания, логика появления образов.</div>
+          <ul>
+            <li>сценарий, раскадровка, аниматики</li>
+            <li>производство контента: съёмка / архив / 3D / композитинг</li>
+            <li>калибровка на площадке и интеграция в архитектуру</li>
+          </ul>
+        `
+      },
+      audio: {
+        title: "Аудиодизайн",
+        kicker: "звук как маршрут",
+        body: `
+          <div>Звук задаёт темп и направление, собирает пространство и ведёт посетителя по смысловым точкам.</div>
+          <ul>
+            <li>саунд-концепция, партитура, голос/тексты</li>
+            <li>пространственное звучание и аудиоточки</li>
+            <li>синхронизация с движением, светом и проекцией</li>
+          </ul>
+        `
+      },
+      ui: {
+        title: "Интерфейсы и AR",
+        kicker: "интерактивные сценарии",
+        body: `
+          <div>Интерактив — это сценарий контакта с контентом: в экспозиции и вокруг неё.</div>
+          <ul>
+            <li>приложения и AR-сцены, интерактивные панели</li>
+            <li>прототипирование пользовательских сценариев</li>
+            <li>контентная и техническая интеграция на площадке</li>
+          </ul>
+        `
+      },
+      ml: {
+        title: "ML / ИИ",
+        kicker: "данные и персонализация",
+        body: `
+          <div>Используем ML там, где он усиливает опыт: делает экспозицию «отвечающей» посетителю.</div>
+          <ul>
+            <li>интерактивные элементы на основе ML</li>
+            <li>персонализация маршрута/контента</li>
+            <li>инструменты анализа зрительского опыта</li>
+          </ul>
+        `
+      },
+      graphic: {
+        title: "Графический дизайн",
+        kicker: "визуальная система проекта",
+        body: `
+          <div>Встраиваем мультимедиа в язык экспозиции: навигация, типографика, носители, иерархия информации.</div>
+          <ul>
+            <li>айдентика и визуальная система проекта</li>
+            <li>навигация и инфографика</li>
+            <li>носители: печать, digital-носители, адаптации</li>
+          </ul>
+        `
+      }
+    };
+
+    function openOverlay(key){
+      const d = DIR[key];
+      if (!d) return;
+      overlayTitle.textContent = d.title;
+      overlayKicker.textContent = d.kicker;
+      overlayBody.innerHTML = d.body;
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden','false');
+    }
+    function closeOverlay(){
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden','true');
+    }
+
+    document.querySelectorAll('.spot').forEach(el => {
+      const key = el.dataset.dir;
+      el.addEventListener('click', () => openOverlay(key));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openOverlay(key); }
+      });
+    });
+
+    overlayClose.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+
+    // ===== Contact modal =====
+    const contactModal = document.getElementById('contactModal');
+    const contactClose = document.getElementById('contactClose');
+    const contactCancel = document.getElementById('contactCancel');
+
+    function openContact(){
+      contactModal.classList.add('open');
+      contactModal.setAttribute('aria-hidden','false');
+    }
+    function closeContact(){
+      contactModal.classList.remove('open');
+      contactModal.setAttribute('aria-hidden','true');
+    }
+
+    document.querySelectorAll('[data-open-contact]').forEach(btn => btn.addEventListener('click', openContact));
+    contactClose.addEventListener('click', closeContact);
+    contactCancel.addEventListener('click', closeContact);
+    contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeContact(); });
+
+    document.getElementById('sendBtn')?.addEventListener('click', () => {
+      alert('Плейсхолдер: отправку подключим позже.');
+    });
+
+    // ===== Reviews slider =====
+    const slidesEl = document.getElementById('reviewSlides');
+    const sliderRoot = document.getElementById('reviews');
+    const prevBtn = document.getElementById('prevReview');
+    const nextBtn = document.getElementById('nextReview');
+    const dotsEl = document.getElementById('reviewDots');
+
+    const total = slidesEl ? slidesEl.children.length : 0;
+    let ridx = 0;
+
+    function renderDots(){
+      if (!dotsEl) return;
+      dotsEl.innerHTML = '';
+      for (let i=0;i<total;i++){
+        const d = document.createElement('div');
+        d.className = 'dot' + (i===ridx ? ' active' : '');
+        d.addEventListener('click', () => { ridx = i; updateSlider(); });
+        dotsEl.appendChild(d);
+      }
+    }
+
+    function updateSlider(){
+      if (!slidesEl) return;
+      slidesEl.style.transform = `translateX(${-ridx * 100}%)`;
+      renderDots();
+    }
+
+    function prev(){ ridx = (ridx - 1 + total) % total; updateSlider(); }
+    function next(){ ridx = (ridx + 1) % total; updateSlider(); }
+
+    if (total > 0){
+      renderDots();
+      updateSlider();
+      prevBtn?.addEventListener('click', prev);
+      nextBtn?.addEventListener('click', next);
+
+      let startX = null;
+      sliderRoot?.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive:true});
+      sliderRoot?.addEventListener('touchend', (e) => {
+        if (startX == null) return;
+        const endX = e.changedTouches[0].clientX;
+        const dx = endX - startX;
+        startX = null;
+        if (Math.abs(dx) > 40){
+          if (dx > 0) prev(); else next();
+        }
+      }, {passive:true});
+    }
+
+    // ===== Global ESC =====
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      closeOverlay();
+      closeContact();
+      pipelinePopup?.classList.add('hidden');
+      closeDrawer();
+    });
+
+    // ===== Pipeline init =====
+    const pipelinePopup = document.getElementById('pipelinePopup');
+    const pipelinePopupBody = document.getElementById('pipelinePopupBody');
+    const pipelinePopupClose = document.getElementById('pipelinePopupClose');
+
+    function initPipeline(){
+      const projects = [
+        {
+          id: "fedra",
+          name: "«Лабиринты Федры»",
+          typeLabel: "Авторский / под ключ",
+          metaHtml: `
+            мультимедийная выставка<br>
+            июнь 2024<br>
+            Санкт-Петербургский Союз художников
+          `,
+          media: {
+            kind: "video",
+            label: "Смотреть видео проекта",
+            src: "https://cdnvideo.tvspb.ru/tvspbru-uploads/2024/06/8-labirinty_site.mp4"
+          },
+          phases: [
+            {
+              title: "Старт",
+              steps: [
+                { title: "Формирование идеи", items: [
+                  "первичная проработка концепции,",
+                  "коммуникация со стейкхолдерами,",
+                  "фиксация рамки проекта."
+                ]},
+                { title: "Научный и кураторский анализ", items: [
+                  "определение смыслового ядра (культурологический разбор текста М. Цветаевой, анализ мифологического и биографического контекста)."
+                ]},
+                { title: "Конструирование нарратива", items: [
+                  "создание структуры истории,",
+                  "разработка принципов повествования."
+                ]}
+              ]
+            },
+            {
+              title: "Драматургическая сборка",
+              steps: [
+                { title: "Интерпретативный дизайн", items: [
+                  "формирование сценографического решения (реальный лабиринт как основа пространства),",
+                  "выделение визуального принципа повествования (жизненные нити Федры и М.Цветаевой как графический и пространственный маркер),",
+                  "проектирование логики прохождения лабиринта,",
+                  "определение расположения проекций, аудиоточек и текстов в логике маршрута."
+                ]},
+                { title: "Формирование содержательного слоя", items: [
+                  "формирование текстового слоя экспозиции,",
+                  "написание экспликации с учетом необходимости понимания посетителями маршрута,",
+                  "подбор стихов для аудиоточек,",
+                  "выбор эпизодов для мультимедийных сцен."
+                ]}
+              ]
+            },
+            {
+              title: "Интеграция",
+              steps: [
+                { title: "Создание мультимедийного слоя", items: [
+                  "сценарий игровых сцен и съёмки с актёрами,",
+                  "звукозапись стихов,",
+                  "создание пространственного звукового ряда,",
+                  "синхронизация звука с прохождением лабиринта."
+                ]},
+                { title: "Экспозиционная инсталляция", items: [
+                  "сборка конструкции лабиринта,",
+                  "инсталляция света и звука,",
+                  "интеграция проекций в архитектуру маршрута."
+                ]}
+              ]
+            }
+          ]
+        },
+        {
+          id: "meyerhold",
+          name: "«Казус Мейерхольда»",
+          typeLabel: "Интеграционный проект",
+          metaHtml: `
+            интеграция мультимедиа в кураторский проект<br>
+            ноябрь 2024 — апрель 2025<br>
+            Санкт-Петербургский театральный музей
+          `,
+          media: null,
+          phases: [
+            {
+              title: "Старт",
+              steps: [
+                { title: "Коммуникация с музеем", items: [
+                  "обсуждение кураторской концепции,",
+                  "определение зон мультимедиа,",
+                  "фиксация ТЗ."
+                ]},
+                { title: "Разработка сценария видеопроекции", items: [
+                  "анализ полученных от музея материалов,",
+                  "раскадровка и создание аниматика."
+                ]}
+              ]
+            },
+            {
+              title: "Драматургическая сборка",
+              steps: [
+                { title: "Интерпретация пространства", items: [
+                  "анализ нарратива выставки и роли 2-го зала (с мультимедийным компонентом) в экспозиции,",
+                  "согласование мультимедиа-компонента с предметами и текстами."
+                ]},
+                { title: "Работа с архивом", items: [
+                  "сбор дополнительных визуальных материалов (видео- и аудиохроника спектакля В.Мейерхольда),",
+                  "выбор эпизодов видеохроники спектакля,",
+                  "отбор фотографий с репетиций спектакля (труппа В.Мейерхольда),",
+                  "стилистическая и техническая обработка архивных материалов,",
+                  "поиск дополнительных фотоматериалов (портреты В.Мейерхольда и З.Райх),",
+                  "работа с картиной К.Брюллова «Последний день Помпеи» [переписать]."
+                ]}
+              ]
+            },
+            {
+              title: "Интеграция",
+              steps: [
+                { title: "Создание мультимедийного решения", items: [
+                  "композиция видеоряда из хроники, фото и Брюллова,",
+                  "эффекты для ощущения «видений» и пересечения времён,",
+                  "звуковая партитура (любовная линия, Помпеи, цитаты из спектакля, звуки стройки театра)."
+                ]},
+                { title: "Финальная интеграция медиамодуля", items: [
+                  "просмотр проекции и звука в зале,",
+                  "тестирование и калибровка звуковой среды,",
+                  "взаимодействие с монтажной командой и дизайнером экспозиции,",
+                  "внесение корректировок (три итерации),",
+                  "утверждение финальной версии."
+                ]}
+              ]
+            }
+          ]
+        }
+      ];
+
+      const slides = Array.from(document.querySelectorAll("#pipelineSlides .slide"));
+      const phaseButtons = Array.from(document.querySelectorAll("#pipelinePhaseNav .nav-btn-phase"));
+      const phaseArrows  = Array.from(document.querySelectorAll("#pipelinePhaseNav .phase-arrow-btn"));
+      const centerLine = document.getElementById("pipelineCenterLine");
+      const phaseNav = document.getElementById("pipelinePhaseNav");
+      const projectCard = document.getElementById("pipelineProjectCard");
+      const projectButtons = Array.from(document.querySelectorAll("#pipelineProjectNav .project-btn"));
+
+      let currentProject = 0;
+      let currentPhase = 0;
+
+      function escapeHtml(s) {
+        return String(s)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function openVideo(src) {
+        pipelinePopupBody.innerHTML = `
+          <video controls autoplay playsinline>
+            <source src="${src}" type="video/mp4" />
+          </video>
+        `;
+        pipelinePopup.classList.remove("hidden");
+        pipelinePopup.setAttribute('aria-hidden','false');
+      }
+
+      function openImage(src) {
+        pipelinePopupBody.innerHTML = `<img src="${src}" alt="" />`;
+        pipelinePopup.classList.remove("hidden");
+        pipelinePopup.setAttribute('aria-hidden','false');
+      }
+
+      function renderProjectCard(p) {
+        const mediaBtn = p.media
+          ? `<div class="project-media" id="pipelineProjectMediaBtn">▶ ${escapeHtml(p.media.label)}</div>`
+          : "";
+
+        projectCard.innerHTML = `
+          <div class="title-row">
+            <div class="project-name">${escapeHtml(p.name)}</div>
+            <div class="project-type">${escapeHtml(p.typeLabel)}</div>
+          </div>
+          <div class="project-meta">${p.metaHtml}</div>
+          ${mediaBtn}
+        `;
+
+        const btn = document.getElementById("pipelineProjectMediaBtn");
+        if (btn && p.media) {
+          btn.addEventListener("click", () => {
+            if (p.media.kind === "video") openVideo(p.media.src);
+            if (p.media.kind === "image") openImage(p.media.src);
+          });
+        }
+      }
+
+      function renderPhaseBody(phaseIdx) {
+        const p = projects[currentProject];
+        const phase = p.phases[phaseIdx];
+        const host = document.getElementById(`pipelinePhaseBody${phaseIdx}`);
+        if (!host) return;
+
+        host.innerHTML = phase.steps.map(step => `
+          <div class="step">
+            <div class="step-title">${escapeHtml(step.title)}</div>
+            <ul class="step-list">
+              ${step.items.map(it => `<li>${escapeHtml(it)}</li>`).join("")}
+            </ul>
+          </div>
+        `).join("");
+      }
+
+      function renderAllPhases() {
+        renderPhaseBody(0);
+        renderPhaseBody(1);
+        renderPhaseBody(2);
+      }
+
+      function updateCenterLine() {
+        if (!centerLine) return;
+        const activeBtn = phaseButtons[currentPhase];
+        if (!activeBtn) return;
+        const navRect = phaseNav.getBoundingClientRect();
+        const btnRect = activeBtn.getBoundingClientRect();
+        const center = btnRect.left + btnRect.width / 2 - navRect.left;
+        centerLine.style.left = center + "px";
+      }
+
+      function setPhase(idx) {
+        if (idx < 0 || idx >= slides.length) return;
+        currentPhase = idx;
+
+        slides.forEach((s, i) => s.classList.toggle("active", i === currentPhase));
+        phaseButtons.forEach((b, i) => b.classList.toggle("active", i === currentPhase));
+
+        phaseArrows.forEach(arr => {
+          if (arr.dataset.dir === "next") {
+            arr.classList.toggle("disabled", currentPhase >= slides.length - 1);
+          }
+        });
+
+        updateCenterLine();
+      }
+
+      function setProject(idx, { resetPhase = true } = {}) {
+        if (idx < 0 || idx >= projects.length) return;
+        currentProject = idx;
+
+        projectButtons.forEach(btn => {
+          const p = Number(btn.dataset.project || 0);
+          btn.classList.toggle("active", p === currentProject);
+        });
+
+        renderProjectCard(projects[currentProject]);
+        renderAllPhases();
+
+        if (resetPhase) setPhase(0);
+      }
+
+      pipelinePopupClose.onclick = () => {
+        pipelinePopup.classList.add("hidden");
+        pipelinePopup.setAttribute('aria-hidden','true');
+      };
+      pipelinePopup.onclick = e => {
+        if (e.target === pipelinePopup) {
+          pipelinePopup.classList.add("hidden");
+          pipelinePopup.setAttribute('aria-hidden','true');
+        }
+      };
+
+      phaseButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const t = Number(btn.dataset.target || 0);
+          setPhase(t);
+        });
+      });
+
+      phaseArrows.forEach(arr => {
+        arr.addEventListener("click", () => {
+          if (arr.classList.contains("disabled")) return;
+          if (arr.dataset.dir === "next" && currentPhase < slides.length - 1) {
+            setPhase(currentPhase + 1);
+          }
+        });
+      });
+
+      projectButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const t = Number(btn.dataset.project || 0);
+          setProject(t, { resetPhase: true });
+        });
+      });
+
+      window.addEventListener("resize", updateCenterLine);
+
+      setProject(0, { resetPhase: true });
+      setPhase(0);
+    }
+
+    document.addEventListener("DOMContentLoaded", initPipeline);
+  </script>
+</body>
+</html>
