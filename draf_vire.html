@@ -478,7 +478,18 @@
       transition: background .2s ease, transform .16s ease;
     }
     .team-ph:hover{background:rgba(255,255,255,.06);transform:translateY(-1px)}
-    @media (max-width: 980px){ .team-grid{grid-template-columns:repeat(4,1fr)} }
+    
+@media (max-width: 1160px){
+  .hero-projector{ display:none !important; }
+}
+
+@media (max-width: 980px){
+
+  .hero{ padding: 104px 0 60px; min-height: auto; }
+  .hero-grid{ grid-template-columns: 1fr; gap: 28px; }
+  .hero-right{ justify-content:flex-start; }
+  .hero-projector{ transform: scale(.62); }
+ .team-grid{grid-template-columns:repeat(4,1fr)} }
     @media (max-width: 560px){ .team-grid{grid-template-columns:repeat(2,1fr)} }
 
     /* ===== Contact modal (mobile-ready) ===== */
@@ -946,7 +957,22 @@
     /*-----------------------*/
 
 
+.utp-all{
+  padding-bottom: 20px;
+   color: transparent;
+  background: linear-gradient(90deg, #7c3aed, #22d3ee, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+   font-family: 'Orbitron', sans-serif;
+  font-weight: 400;
+  font-size: clamp(30px, 7vw, 65px);
+  letter-spacing: clamp(1px, 0.7vw, 5px);
+}
 
+.utp-text{
+  line-height: .92;
+  display:block;
+}
 
 .utp{
  border-radius: 14px;                 /* как на рефе: не pill, а "сквёркл" */
@@ -988,13 +1014,12 @@
 
 
     .container{
-      position:relative;
-  width: min(1100px, calc(100% - 28px));
-  margin: 0 auto;
-  transform:none;
-  top:auto;
-  left:auto;
-        display: flex;
+      position:relative; 
+      margin: 0;
+      transform:none;
+      top:auto;
+      left:auto;
+      display: flex;
         
         justify-content: center;
         flex-wrap: wrap;
@@ -1036,6 +1061,8 @@
 }
 
 .t-left {
+  background: transparent;
+  backdrop-filter: none;
   color: transparent;
   background: linear-gradient(90deg, #7c3aed, #22d3ee, #a78bfa);
   -webkit-background-clip: text;
@@ -1328,17 +1355,270 @@
   }
 }
 
-.hero {
-  min-height: 400px;          /* или 100svh если хочешь полноэкранный hero */
-  display:flex;
-  align-items:center;
-  justify-content:center;
+
+.hero{
+  border-top: none;
+  /* no artificial vertical space */
+  min-height: auto;
+  padding: 84px 0 40px;
+  display:block;
 }
 
+.hero-grid{
+  width: min(1200px, 92vw);
+  margin: 0 auto;
+  display:grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 42px;
+  align-items: stretch; /* right panel matches left height */
+}
+
+.hero-left{
+  display:flex;
+  flex-direction: column;
+  align-items:flex-start;
+}
+
+.hero-projector{
+  margin-top: -8px;
+  width: min(560px, 100%);
+  height: 260px; /* keep layout tight (transform doesn't affect flow) */
+  overflow: visible;
+  pointer-events:none;
+  opacity: .95;
+}
+
+.hero-projector .clock{ 
+  width:100%;
+  transform: scale(.62);
+  transform-origin: left top;
+}
+
+.hero-right{
+  display:flex;
+  justify-content:flex-end;
+  align-items:flex-start;
+}
+
+/* --- responsive hero layout --- */
+@media (max-width: 980px){
+  .hero{ padding: 72px 0 34px; }
+  .hero-grid{ grid-template-columns: 1fr; gap: 26px; }
+  .hero-right{ justify-content:flex-start; }
+  .hero-projector{ height: 230px; }
+  .hero-projector .clock{ transform: scale(.58); }
+}
+@media (max-width: 560px){
+  .hero{ padding: 64px 0 28px; }
+  .hero-projector{ height: 210px; }
+  .hero-projector .clock{ transform: scale(.52); }
+}
+/* ===== Hero directions (right panel) ===== */
+.dir-panel{
+  position:relative;
+  display:grid;
+  grid-template-columns: 72px minmax(260px, 420px);
+  gap:22px;
+  align-items:start;
+  justify-content:end;
+  margin-left:auto;
+  padding-right: 10px;
+  user-select:none;
+}
+/* nav column: label on top, steps below */
+.dir-nav{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding-top:4px;
+}
+
+.dir-line{
+  width: 1px;
+  height: 44px;
+  background: rgba(255,255,255,.22);
+  margin: 2px 0 2px;
+  border-radius: 2px;
+}
+
+@media (max-width: 980px){
+  /* on mobile: directions go below, full width, no squeezing */
+  .dir-panel{
+    width: 100%;
+    justify-content: start;
+    margin-left: 0;
+    padding-right: 0;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  /* nav column: label on top, steps below */
+.dir-label{
+    writing-mode: initial;
+    transform: none;
+    text-transform: lowercase;
+    letter-spacing: .10em;
+    opacity: .8;
+  }
+  .dir-line{ display:none; }
+  .dir-rail{
+    display:flex;
+    gap:10px;
+    overflow:auto;
+    padding-bottom: 6px;
+  }
+  .dir-rail-line{ display:none; }
+  .dir-step{ flex:0 0 auto; }
+  .dir-card{ max-width: 100%; }
+}
+
+.dir-label{
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing:.12em;
+  text-transform: lowercase;
+  font-weight:700;
+  color: rgba(255,255,255,.72);
+  opacity:.85;
+  padding-top:0;
+}
+
+.dir-rail{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-top:0;
+}
+
+.dir-step{
+  width:44px;
+  height:40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.70);
+  font-weight:700;
+  letter-spacing:.08em;
+  cursor:pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.dir-step:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+
+.dir-step.is-active{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.28);
+  color: rgba(255,255,255,.92);
+}
+
+.dir-rail-line{ display:none; }
+
+.dir-card{
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  padding: 18px 18px 16px;
+  backdrop-filter: blur(10px);
+}
+
+/* Make right card fill the hero column height (matches UTP + projector) */
+.hero-right{ align-self: stretch; }
+.dir-panel{ height: 100%; }
+.dir-card{ height: 100%; display:flex; flex-direction:column; }
+.dir-body{ flex: 1 1 auto; overflow:auto; }
+
+.dir-head{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  margin-bottom: 10px;
+}
+
+.dir-num{
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.85);
+}
+
+.dir-avatar{
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  box-shadow: 0 0 0 4px rgba(0,0,0,.18) inset;
+  flex: 0 0 auto;
+  margin-top: 6px;
+}
+
+.dir-title{
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  margin: 2px 0 2px;
+}
+
+.dir-kicker{
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.dir-body{
+  color: rgba(255,255,255,.78);
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.dir-body ul{
+  margin:10px 0 0;
+  padding-left: 18px;
+}
+
+.dir-body li{ margin: 6px 0; }
 
 
 
-  </style>
+/* ===== v12 override: mobile dir rail horizontal above card ===== */
+@media (max-width: 980px){
+  .dir-panel{
+    grid-template-columns: 1fr !important;
+    justify-content: stretch !important;
+    margin-left: 0 !important;
+    padding-right: 0 !important;
+    gap: 14px !important;
+  }
+  .dir-nav{
+    flex-direction: row !important;
+    align-items: center !important;
+    height: auto !important;
+    justify-content: flex-start !important;
+  }
+  .dir-label{
+    writing-mode: initial !important;
+    transform: none !important;
+    margin: 0 12px 0 0 !important;
+  }
+  .dir-line{
+    width: 46px !important;
+    height: 1px !important;
+    margin: 0 12px 0 0 !important;
+  }
+  .dir-rail{
+    flex-direction: row !important;
+    gap: 10px !important;
+    margin-top: 0 !important; /* cancel bottom-stick on mobile */
+  }
+  .dir-card{
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+</style>
 </head>
 
 <body>
@@ -1412,26 +1692,57 @@
   </div>
 
   <main>
-    <!-- HERO -->
-    <section class="hero" id="top">
-      <div class="container">
+
+<section class="hero" id="top">
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="utp-all">
+<div class="utp-text">Мы превращаем музеи<br/> в живые истории</div>
+<button class="btn utp utp-ghost"> связаться</button>
+<button class="btn utp">смотреть процесс</button>
+</div>
+      <div class="hero-projector" aria-hidden="true">
         <div class="clock">
-        
-          <div class="t-container">
-            <div class="t-left" id="time-left">Мы превращаем музеи в живые истории</div>
-          </div>
-          <div class="time-ctrl-container">
-            <div class="time-ctrl">
-              <button > связаться</button>
-              <div class="holo"> </div>
-              <div class="holo-border"></div>
-              <button >смотреть процесс</button>
-            </div>
-          </div>
-        </div>
+<div class="t-container">
+<div class="t-left" id="time-left"></div>
+</div>
+<div class="time-ctrl-container">
+<div class="time-ctrl">
+<div class="holo"> </div>
+<div class="holo-border"></div>
+</div>
+</div>
+</div>
       </div>
- 
-    </section>
+    </div>
+    <div class="hero-right">
+      <div aria-label="Направления" class="dir-panel">
+<div class="dir-nav">
+<div class="dir-label">мы делаем</div>
+<div class="dir-line" aria-hidden="true"></div>
+<div aria-label="Список направлений" class="dir-rail" role="tablist">
+<button aria-selected="true" class="dir-step is-active" data-dir="video" role="tab" type="button">01</button>
+<button aria-selected="false" class="dir-step" data-dir="audio" role="tab" type="button">02</button>
+<button aria-selected="false" class="dir-step" data-dir="ui" role="tab" type="button">03</button>
+<button aria-selected="false" class="dir-step" data-dir="ml" role="tab" type="button">04</button>
+<button aria-selected="false" class="dir-step" data-dir="graphic" role="tab" type="button">05</button>
+</div>
+</div>
+<div class="dir-card" role="tabpanel">
+<div class="dir-head">
+<div class="dir-num" id="dirNum">01</div>
+<div aria-hidden="true" class="dir-avatar" id="dirAvatar"></div>
+</div>
+<div class="dir-title" id="dirTitle">Видеопроекции</div>
+<div class="dir-kicker" id="dirKicker">пространственная режиссура</div>
+<div class="dir-body" id="dirBody"></div>
+</div>
+</div>
+    </div>
+  </div>
+</section>
+
+
 
     <!-- About -->
     <section id="about">
@@ -1741,7 +2052,61 @@
       }
     };
 
-    function openOverlay(key){
+    
+    // ===== Hero directions (right panel) =====
+    const DIR_ORDER = ['video','audio','ui','ml','graphic'];
+    const dirNum = document.getElementById('dirNum');
+    const dirTitle = document.getElementById('dirTitle');
+    const dirKicker = document.getElementById('dirKicker');
+    const dirBody = document.getElementById('dirBody');
+
+    function setDir(key){
+      const d = DIR[key];
+      if (!d) return;
+
+      const idx = DIR_ORDER.indexOf(key);
+      const num = String(idx + 1).padStart(2,'0');
+
+      if (dirNum) dirNum.textContent = num;
+      if (dirTitle) dirTitle.textContent = d.title;
+      if (dirKicker) dirKicker.textContent = d.kicker;
+      if (dirBody) dirBody.innerHTML = d.body;
+
+      document.querySelectorAll('.dir-step').forEach(btn => {
+        const isActive = btn.dataset.dir === key;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-selected', String(isActive));
+      });
+    }
+
+    // initial
+    setDir('video');
+
+    // click navigation
+    document.querySelectorAll('.dir-step').forEach(btn => {
+      btn.addEventListener('click', () => setDir(btn.dataset.dir));
+    });
+
+    // wheel to switch (throttled)
+    const dirPanel = document.querySelector('.dir-panel');
+    let wheelLock = false;
+    if (dirPanel){
+      dirPanel.addEventListener('wheel', (e) => {
+        if (wheelLock) return;
+        const dy = e.deltaY || 0;
+        if (Math.abs(dy) < 10) return;
+        wheelLock = true;
+        setTimeout(() => wheelLock = false, 250);
+
+        const active = document.querySelector('.dir-step.is-active');
+        const key = active ? active.dataset.dir : 'video';
+        const i = DIR_ORDER.indexOf(key);
+        const next = dy > 0 ? Math.min(DIR_ORDER.length-1, i+1) : Math.max(0, i-1);
+        if (next !== i) setDir(DIR_ORDER[next]);
+      }, { passive: true });
+    }
+
+function openOverlay(key){
       const d = DIR[key];
       if (!d) return;
       overlayTitle.textContent = d.title;
