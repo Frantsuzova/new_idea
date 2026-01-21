@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>c²-command — прототип</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
+      --font-ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, Helvetica, sans-serif;
+      --font-soft: 'Comfortaa', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, Helvetica, sans-serif;
       --bg:#0b0c10;
       --fg:#f5f5f5;
       --muted:rgba(245,245,245,.72);
@@ -29,7 +35,7 @@
     html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif;
+      font-family: var(--font-ui);
       color:var(--fg);
       background: var(--bg);
       overflow-x:hidden;
@@ -47,18 +53,40 @@
       border-bottom:1px solid var(--line);
       z-index:40;
     }
-    .brand{
-      font-weight:800;
-      letter-spacing:.2px;
+        .brand{
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:10px;
       user-select:none;
+
+      font-family: var(--font-soft);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .brand-logo{
+      width:34px;
+      height:34px;
+      display:block;
+      filter: drop-shadow(0 0 14px rgba(34,211,238,.10));
+    }
+    .brand-text{
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      white-space:nowrap;
+    }
+    .brand sup{
+      font-size:.65em;
+      line-height:0;
+      position:relative;
+      top:-.35em;
+      margin-left:1px;
     }
     .brand small{
       font-weight:700;
       opacity:.70;
       letter-spacing:.08em;
+      font-size:12px;
     }
 
     .nav{
@@ -135,40 +163,117 @@
     /* ===== Layout ===== */
     main{padding-top:64px}
     section{
-      padding:84px 14px;
+      padding:44px 14px;
       border-top:1px solid var(--line);
       background: transparent;
     }
-    .wrap{max-width:1100px;margin:0 auto}
+    .wrap{max-width:min(1200px, 92vw);margin:0 auto;padding:0 14px;box-sizing:border-box}
+  .hero-wrap{padding:0; box-sizing:border-box;}
     .grid{display:grid;gap:18px}
     .cols-2{grid-template-columns:1fr 1fr}
     @media (max-width: 860px){ .cols-2{grid-template-columns:1fr} }
 
     /* Buttons */
     .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:12px 18px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.88);
-      background:var(--btn); color:var(--btnText);
-      cursor:pointer; text-decoration:none; font-size:14px;
-      transition:transform .15s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
-      user-select:none;
+      position:relative;
+      isolation:isolate; /* so ::after can sit behind */
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+
+      padding:11px 18px;
+      border-radius:14px;
+
+      border:1px solid rgba(99,102,241,.34);
+      background: linear-gradient(90deg, rgba(17,24,39,.92), rgba(88,28,135,.36));
+      cursor:pointer;
+      text-decoration:none;
+
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.01em;
       white-space:nowrap;
+      user-select:none;
+
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.06) inset,
+        0 14px 40px rgba(0,0,0,.35);
+
+      transition: transform .18s ease, filter .25s ease, border-color .25s ease, box-shadow .25s ease;
+      font-family: var(--font-soft);
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn:hover{transform:translateY(-1px)}
+
+    /* button text (no gradient clip — stable across browsers) */
+    .btn .btn__text{
+      position:relative;
+      z-index:1;
+      background:none;
+      color: rgba(103,232,249,1);
+      -webkit-text-fill-color: currentColor;
+      display:inline-block;
+      text-shadow: 0 0 12px rgba(34,211,238,.14);
+    }
+
+    /* outer glow */
+    .btn::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:inherit;
+      background: linear-gradient(90deg, rgba(79,70,229,.55), rgba(168,85,247,.55));
+      filter: blur(12px);
+      opacity:.75;
+      z-index:-1;
+      transition: opacity .45s ease, filter .45s ease;
+      pointer-events:none;
+    }
+    /* removed sheen effect */
+.btn:hover{
+      transform: translateY(-1px) scale(1.05);
+      filter: brightness(1.05);
+      border-color: rgba(34,211,238,.40);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.08) inset,
+        0 18px 52px rgba(0,0,0,.42);
+    }
+    .btn:hover::after{ opacity:1; filter: blur(13px); }    .btn:active{ transform: translateY(0) scale(.97); filter: brightness(1.0); }
+
+    .btn--lg{ padding:12px 22px; font-size:15px; border-radius:16px; }
+
+    /* outline/ghost variant (CodePen-like) */
     .btn--ghost{
-      background:transparent;
-      color:var(--fg);
-      border-color:rgba(255,255,255,.28);
+      background: transparent;
+      border-color: rgba(34,211,238,.36);
+      box-shadow: 0 0 0 1px rgba(34,211,238,.10) inset;
     }
-    .btn--ghost:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.06)}
+    .btn--ghost::after{
+      background: linear-gradient(90deg, rgba(34,211,238,.50), rgba(129,140,248,.50));
+      opacity:.65;
+    }
+    .btn--ghost .btn__text{ color: rgba(103,232,249,1); text-shadow: 0 0 12px rgba(34,211,238,.18); }
+    .btn--ghost:hover{
+      background: rgba(34,211,238,.06);
+      border-color: rgba(34,211,238,.56);
+      box-shadow: 0 0 0 1px rgba(34,211,238,.14) inset;
+    }
+
+    /* subdued variant (kept for external link) */
     .btn--dark{
-      background:rgba(255,255,255,.10);
-      color:var(--fg);
-      border-color:rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.22);
+      background: linear-gradient(90deg, rgba(17,24,39,.88), rgba(17,24,39,.65));
     }
-    .btn--dark:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}
+    .btn--dark::after{
+      background: linear-gradient(90deg, rgba(255,255,255,.22), rgba(255,255,255,.10));
+      opacity:.35;
+      filter: blur(10px);
+    }
+    .btn--dark .btn__text{ color: rgba(245,245,245,.92); -webkit-text-fill-color: currentColor; text-shadow:none; background:none; }
+    .btn--dark:hover{
+      border-color: rgba(255,255,255,.32);
+      background: linear-gradient(90deg, rgba(17,24,39,.92), rgba(17,24,39,.72));
+    }
 
     /* ===== Blocks ===== */
     .block{
@@ -536,6 +641,23 @@
       -webkit-overflow-scrolling: touch;
     }
 
+    .contact-note{
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(34,211,238,.16);
+      background: rgba(34,211,238,.05);
+      color: rgba(245,245,245,.78);
+      line-height: 1.55;
+      font-size: 13px;
+      font-family: var(--font-soft);
+    }
+    .contact-note a{
+      color: rgba(103,232,249,1);
+      text-decoration: none;
+    }
+    .contact-note a:hover{ text-decoration: underline; }
+
     .field{
       width:100%;
       padding:12px 12px;
@@ -559,6 +681,15 @@
     @media (max-width: 420px){
       .form-actions{flex-direction:column;align-items:stretch}
       .form-actions .btn{width:100%}
+    }
+
+    .footer-cta-title{
+      font-family: var(--font-soft);
+      font-weight:700;
+      font-size:20px;
+      letter-spacing:-.01em;
+      color:rgba(255,255,255,.92);
+      text-shadow: 0 0 18px rgba(0,0,0,.35);
     }
 
     footer{
@@ -963,7 +1094,7 @@
   background: linear-gradient(90deg, #7c3aed, #22d3ee, #a78bfa);
   -webkit-background-clip: text;
   background-clip: text;
-   font-family: 'Orbitron', sans-serif;
+   font-family: var(--font-soft);
   font-weight: 400;
   font-size: clamp(30px, 7vw, 65px);
   letter-spacing: clamp(1px, 0.7vw, 5px);
@@ -975,39 +1106,25 @@
   padding-bottom: 20px;
 }
 
-.utp{
- border-radius: 14px;                 /* как на рефе: не pill, а "сквёркл" */
-  padding: 12px 22px;
-  border: 1px solid rgba(0,252,252,.25);
-  color: #0b0c10;
-  background: linear-gradient(90deg, #7c3aed, #22d3ee);
-  box-shadow:
-    0 10px 30px rgba(124,58,237,.20),
-    0 10px 30px rgba(34,211,238,.18),
-    0 0 0 1px rgba(255,255,255,.06) inset;
-
-
-}
-.utp:hover{
-  transform: translateY(-1px);
-  filter: brightness(1.05);
+.utp-all{
+  padding-bottom: 20px;
+  color: transparent;
+  background: linear-gradient(90deg, #7c3aed, #22d3ee, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: var(--font-soft);
+  font-weight: 600;
+  font-size: clamp(30px, 7vw, 65px);
+  letter-spacing: clamp(1px, 0.7vw, 5px);
 }
 
-.utp:active{
-  transform: translateY(0px);
+.utp-text{
+  line-height: .92;
+  display:block;
+  padding-bottom: 20px;
 }
 
-.utp-ghost{
-  background: transparent;
-  color: rgba(0,252,252,.92);
-  border-color: rgba(0,252,252,.30);
-  box-shadow: 0 0 0 1px rgba(0,252,252,.08) inset;
-}
-
-.utp-ghost:hover{
-  background: rgba(0,252,252,.06);
-  border-color: rgba(0,252,252,.45);
-}
+/* Hero CTA buttons: just larger .btn + optional ghost */
 
 
 
@@ -1361,13 +1478,13 @@
   border-top: none;
   /* no artificial vertical space */
   min-height: auto;
-  padding: 84px 0 40px;
+  padding: 44px 0 40px;
   display:block;
 }
 
 .hero-grid{
-  width: min(1200px, 92vw);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   display:grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 42px;
@@ -1381,12 +1498,11 @@
 }
 
 .hero-projector{
-  margin-top: -8px;
+  margin-top: -68px;
   width: min(560px, 100%);
   height: 260px; /* keep layout tight (transform doesn't affect flow) */
   overflow: visible;
   pointer-events:none;
-  opacity: .95;
 }
 
 .hero-projector .clock{ 
@@ -1627,12 +1743,127 @@
   }
 }
 
+
+
+/* ===== v2026: Directions as visible cards (no mandatory switching) ===== */
+.dirs{
+  width: min(520px, 100%);
+}
+.dirs-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.dirs-title{
+  margin:0;
+  font-size:14px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.72);
+}
+.dirs-hint{
+  font-size:12px;
+  color:rgba(255,255,255,.50);
+  white-space:nowrap;
+}
+.dirs-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+}
+.dirs-card{
+  text-align:left;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  padding:12px 12px 10px;
+  cursor:pointer;
+  color:rgba(255,255,255,.90);
+  transition: transform .15s ease, background .2s ease, border-color .2s ease;
+}
+.dirs-card:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.22);
+}
+.dirs-card{
+  position:relative;
+}
+.dirs-card::after{
+  content:"↗";
+  position:absolute;
+  top:10px;
+  right:10px;
+  font-size:12px;
+  opacity:.35;
+  transition: opacity .15s ease, transform .15s ease;
+  pointer-events:none;
+}
+.dirs-card:hover::after{
+  opacity:.70;
+  transform: translate(2px,-2px);
+}
+.dirs-card:focus-visible{
+  outline:2px solid rgba(255,255,255,.55);
+  outline-offset:2px;
+}
+.dirs-top{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:6px;
+}
+.dirs-num{
+  font-size:26px;
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.04em;
+  color:rgba(255,255,255,.88);
+  flex:0 0 auto;
+}
+.dirs-name{
+  margin:0;
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:-.01em;
+  line-height:1.1;
+}
+.dirs-kicker{
+  margin:2px 0 0;
+  font-size:12px;
+  color:rgba(255,255,255,.62);
+  line-height:1.25;
+}
+.dirs-card.is-wide{ grid-column:1 / -1; }
+
+@media (max-width: 980px){
+  .dirs{ width: 100%; }
+  .dirs-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px){
+  /* mobile: stack cards vertically */
+  .dirs-grid{
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+  }
+  .dirs-card.is-wide{ grid-column:auto; }
+  .dirs-hint{ display:none; }
+}
+
 </style>
 </head>
 
 <body>
   <header>
-    <div class="brand">c2-command <small>prototype</small></div>
+    <div class="brand" aria-label="c²-command">
+      <img class="brand-logo" src="logo-c2.png" alt="c²" />
+      <div class="brand-text">c<sup>2</sup>command <small></small></div>
+    </div>
 
     <nav class="nav" aria-label="Навигация">
       <a href="#about">О нас</a>
@@ -1679,18 +1910,19 @@
       <div class="modal-head">
         <div class="modal-title">Связаться</div>
         <button class="overlay-close" id="contactClose">Закрыть</button>
-      </div>
-      <div class="modal-body">
-        <form class="grid" onsubmit="return false;">
+      </div>      <div class="modal-body">
+        <div class="contact-note">
+          Вы можете связаться с нами по e-mail (<a href="mailto:contact@c2-command.art">contact@c2-command.art</a>) или заполнить форму ниже.
+        </div>
+<form class="grid" onsubmit="return false;">
           <input class="field" placeholder="Имя" />
           <input class="field" placeholder="Email" />
           <input class="field" placeholder="Организация / музей (опционально)" />
           <textarea class="field" placeholder="Коротко: задача, площадка, сроки"></textarea>
 
           <div class="form-actions">
-            <button class="btn" type="button" id="sendBtn">Отправить</button>
-            <button class="btn btn--ghost" type="button" id="contactCancel">Отмена</button>
-          </div>
+            <button class="btn" type="button" id="sendBtn"><span class="btn__text">Отправить</span></button>
+</div>
 
           <div style="color:rgba(255,255,255,.55);font-size:12px;line-height:1.5">
             (Плейсхолдер: подключим отправку формы позже.)
@@ -1703,12 +1935,13 @@
   <main>
 
 <section class="hero" id="top">
+  <div class="wrap hero-wrap">
   <div class="hero-grid">
     <div class="hero-left">
       <div class="utp-all">
 <div class="utp-text">Мы превращаем музеи<br/> в живые истории</div>
-<button class="btn utp utp-ghost"> связаться</button>
-<button class="btn utp">смотреть процесс</button>
+<button class="btn btn--ghost btn--lg" type="button" data-open-contact><span class="btn__text">связаться</span></button>
+<a class="btn btn--lg" href="#pipeline"><span class="btn__text">смотреть процесс</span></a>
 </div>
       <div class="hero-projector" aria-hidden="true">
         <div class="clock">
@@ -1725,29 +1958,78 @@
       </div>
     </div>
     <div class="hero-right">
-      <div aria-label="Направления" class="dir-panel">
-<div class="dir-nav">
-<div class="dir-label">мы делаем</div>
-<div class="dir-line" aria-hidden="true"></div>
-<div aria-label="Список направлений" class="dir-rail" role="tablist">
-<button aria-selected="true" class="dir-step is-active" data-dir="video" role="tab" type="button">01</button>
-<button aria-selected="false" class="dir-step" data-dir="audio" role="tab" type="button">02</button>
-<button aria-selected="false" class="dir-step" data-dir="ui" role="tab" type="button">03</button>
-<button aria-selected="false" class="dir-step" data-dir="ml" role="tab" type="button">04</button>
-<button aria-selected="false" class="dir-step" data-dir="graphic" role="tab" type="button">05</button>
+      
+<div class="dirs" aria-label="Направления" id="dirs">
+  <div class="dirs-head">
+    <h3 class="dirs-title">Мы делаем</h3>
 </div>
-</div>
-<div class="dir-card" role="tabpanel">
-<div class="dir-head">
-<div class="dir-num" id="dirNum">01</div>
-<div aria-hidden="true" class="dir-avatar" id="dirAvatar"></div>
-</div>
-<div class="dir-title" id="dirTitle">Видеопроекции</div>
-<div class="dir-kicker" id="dirKicker">пространственная режиссура</div>
-<div class="dir-body" id="dirBody"></div>
-</div>
-</div>
+<div class="dirs-grid">
+  <button class="dirs-card dir-mini" type="button" data-dir="video" aria-label="01 Видеопроекции">
+    <div class="dirs-top">
+      <div class="dirs-num">01</div>
+      <div>
+        <p class="dirs-name">Видеопроекции</p>
+        <p class="dirs-kicker">пространственная режиссура</p>
+      </div>
     </div>
+  </button>
+
+  <button class="dirs-card dir-mini" type="button" data-dir="audio" aria-label="02 Аудиодизайн">
+    <div class="dirs-top">
+      <div class="dirs-num">02</div>
+      <div>
+        <p class="dirs-name">Аудиодизайн</p>
+        <p class="dirs-kicker">звук как маршрут</p>
+      </div>
+    </div>
+  </button>
+
+  <button class="dirs-card dir-mini" type="button" data-dir="ui" aria-label="03 Интерфейсы">
+    <div class="dirs-top">
+      <div class="dirs-num">03</div>
+      <div>
+        <p class="dirs-name">Интерфейсы</p>
+        <p class="dirs-kicker">интерактивные сценарии</p>
+      </div>
+    </div>
+  </button>
+
+  <button class="dirs-card dir-mini" type="button" data-dir="graphic" aria-label="04 Графический дизайн">
+    <div class="dirs-top">
+      <div class="dirs-num">04</div>
+      <div>
+        <p class="dirs-name">Графический дизайн</p>
+        <p class="dirs-kicker">визуальная система проекта</p>
+      </div>
+    </div>
+  </button>
+
+  <button class="dirs-card dir-mini" type="button" data-dir="vrar" aria-label="05 VR / AR">
+    <div class="dirs-top">
+      <div class="dirs-num">05</div>
+      <div>
+        <p class="dirs-name">VR / AR</p>
+        <p class="dirs-kicker">иммерсивные слои</p>
+      </div>
+    </div>
+  </button>
+
+  <button class="dirs-card dir-mini" type="button" data-dir="ml" aria-label="06 ML / AI">
+    <div class="dirs-top">
+      <div class="dirs-num">06</div>
+      <div>
+        <p class="dirs-name">ML / AI</p>
+        <p class="dirs-kicker">данные и персонализация</p>
+      </div>
+    </div>
+  </button>
+</div>
+  </div>
+</div>
+
+    </div>
+    </div>
+  </div>
   </div>
 </section>
 
@@ -1755,43 +2037,34 @@
 
     <!-- About -->
     <section id="about">
-      <div class="wrap grid cols-2">
-        <div class="block">
-          <div class="k">о нас и целях</div>
-          <p style="color:rgba(255,255,255,.82);line-height:1.65;margin:0">
-            c²-command проектирует и реализует мультимедийные решения для музеев на стыке искусства, технологий и исследовательского подхода.
-            Наша цель — чтобы экспозиция становилась осмысленным путешествием: вовлекала, направляла внимание и помогала прожить историю,
-            а не просто «посмотреть» её.
-          </p>
-        </div>
+  <div class="wrap grid cols-2">
+    <div class="block">
+      <div class="k">о нас и целях</div>
+      <p style="color:rgba(255,255,255,.82);line-height:1.65;margin:0">
+        c² command проектирует и реализует мультимедийные решения для музеев на стыке искусства, технологий и исследовательского подхода.
+        Наша цель — чтобы экспозиция становилась осмысленным путешествием: вовлекала, направляла внимание и помогала прожить историю,
+        а не просто «посмотреть» её.
+      </p>
+    </div>
 
-        <div class="block">
-          <div class="k">что мы делаем</div>
-          <ul style="margin:0;padding-left:18px;line-height:1.75;color:rgba(255,255,255,.82)">
-            <li>Видеопроекции и пространственная режиссура</li>
-            <li>Аудиодизайн: звуковые инсталляции, маршруты, аудиоточки</li>
-            <li>Интерфейсы и AR: приложения, панели, интерактивные сценарии</li>
-            <li>ML/ИИ: интерактив, персонализация, работа с данными</li>
-            <li>Графический дизайн: визуальные системы и носители экспозиции</li>
-          </ul>
-        </div>
-
-        <div class="block">
-          <div class="k">Процесс, если коротко</div>
-          <p style="color:rgba(255,255,255,.78);line-height:1.65;margin:0">
-            Диагностика экспозиции → драматургия и сценарии → прототипирование → производство контента и софта →
-            монтаж и запуск → сопровождение и обучение команды площадки.
-          </p>
-        </div>
-
-        <div class="block">
-          <div class="k">формат сотрудничества</div>
-          <p style="color:rgba(255,255,255,.78);line-height:1.65;margin:0">
-            Ведём проект целиком: от концепции и прототипов до реализации на площадке, с единым окном коммуникации и прозрачной сборкой этапов.
-          </p>
-        </div>
+    <div class="grid" style="gap:18px">
+      <div class="block">
+        <div class="k">Процесс, если коротко</div>
+        <p style="color:rgba(255,255,255,.78);line-height:1.65;margin:0">
+          Диагностика экспозиции → драматургия и сценарии → прототипирование → производство контента и софта →
+          монтаж и запуск → сопровождение и обучение команды площадки.
+        </p>
       </div>
-    </section>
+
+      <div class="block">
+        <div class="k">формат сотрудничества</div>
+        <p style="color:rgba(255,255,255,.78);line-height:1.65;margin:0">
+          Ведём проект целиком: от концепции и прототипов до реализации на площадке, с единым окном коммуникации и прозрачной сборкой этапов.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- Pipeline -->
     <section id="pipeline">
@@ -1920,7 +2193,7 @@
             сценография, сторителлинг, интерактивные маршруты, интерфейсы, звук и работа с данными.
           </p>
           <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
-            <a class="btn btn--dark" href="https://aims-seminar.space/" target="_blank" rel="noopener">Перейти на сайт семинара</a>
+            <a class="btn btn--dark" href="https://aims-seminar.space/" target="_blank" rel="noopener"><span class="btn__text">Перейти на сайт семинара</span></a>
           </div>
         </div>
 
@@ -1957,19 +2230,19 @@
           <div class="k">обратная связь</div>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
             <div>
-              <div style="font-weight:800;font-size:18px;letter-spacing:-.01em">Есть задача или идея?</div>
+              <div class="footer-cta-title">Есть задача или идея?</div>
               <div style="color:rgba(255,255,255,.66);margin-top:6px;line-height:1.6">
                 Напишите — мы поможем собрать её в понятный процесс и аккуратно встроить мультимедиа в историю.
               </div>
             </div>
-            <button class="btn" type="button" data-open-contact>Связаться</button>
+            <button class="btn" type="button" data-open-contact><span class="btn__text">Связаться</span></button>
           </div>
         </div>
       </div>
     </section>
 
     <footer>
-      <div class="wrap">© c²-command — кликабельный прототип</div>
+      <div class="wrap">© c² command</div>
     </footer>
   </main>
 
@@ -1998,124 +2271,68 @@
     const overlayBody = document.getElementById('overlayBody');
     const overlayClose = document.getElementById('overlayClose');
 
-    const DIR = {
-      video: {
-        title: "Видеопроекции",
-        kicker: "пространственная режиссура",
-        body: `
-          <div>Проекция как часть экспозиционной драматургии: ритм, масштаб, точки внимания, логика появления образов.</div>
-          <ul>
-            <li>сценарий, раскадровка, аниматики</li>
-            <li>производство контента: съёмка / архив / 3D / композитинг</li>
-            <li>калибровка на площадке и интеграция в архитектуру</li>
-          </ul>
-        `
-      },
-      audio: {
-        title: "Аудиодизайн",
-        kicker: "звук как маршрут",
-        body: `
-          <div>Звук задаёт темп и направление, собирает пространство и ведёт посетителя по смысловым точкам.</div>
-          <ul>
-            <li>саунд-концепция, партитура, голос/тексты</li>
-            <li>пространственное звучание и аудиоточки</li>
-            <li>синхронизация с движением, светом и проекцией</li>
-          </ul>
-        `
-      },
-      ui: {
-        title: "Интерфейсы и AR",
-        kicker: "интерактивные сценарии",
-        body: `
-          <div>Интерактив — это сценарий контакта с контентом: в экспозиции и вокруг неё.</div>
-          <ul>
-            <li>приложения и AR-сцены, интерактивные панели</li>
-            <li>прототипирование пользовательских сценариев</li>
-            <li>контентная и техническая интеграция на площадке</li>
-          </ul>
-        `
-      },
-      ml: {
-        title: "ML / ИИ",
-        kicker: "данные и персонализация",
-        body: `
-          <div>Используем ML там, где он усиливает опыт: делает экспозицию «отвечающей» посетителю.</div>
-          <ul>
-            <li>интерактивные элементы на основе ML</li>
-            <li>персонализация маршрута/контента</li>
-            <li>инструменты анализа зрительского опыта</li>
-          </ul>
-        `
-      },
-      graphic: {
-        title: "Графический дизайн",
-        kicker: "визуальная система проекта",
-        body: `
-          <div>Встраиваем мультимедиа в язык экспозиции: навигация, типографика, носители, иерархия информации.</div>
-          <ul>
-            <li>айдентика и визуальная система проекта</li>
-            <li>навигация и инфографика</li>
-            <li>носители: печать, digital-носители, адаптации</li>
-          </ul>
-        `
-      }
-    };
-
     
-    // ===== Hero directions (right panel) =====
-    const DIR_ORDER = ['video','audio','ui','ml','graphic'];
-    const dirNum = document.getElementById('dirNum');
-    const dirTitle = document.getElementById('dirTitle');
-    const dirKicker = document.getElementById('dirKicker');
-    const dirBody = document.getElementById('dirBody');
+const DIR = {
+  video: {
+    title: "Видеопроекции",
+    kicker: "пространственная режиссура",
+    body: `
+      <div>Проекция как часть экспозиционной драматургии: ритм, масштаб, точки внимания, логика появления образов.</div>
+      <ul>
+        <li>сценарий, раскадровка, аниматики</li>
+        <li>производство контента: съёмка / архив / 3D / композитинг</li>
+        <li>калибровка на площадке и интеграция в архитектуру</li>
+      </ul>
+    `
+  },
+  audio: {
+    title: "Аудиодизайн",
+    kicker: "звук как маршрут",
+    body: `
+      <div>Звук задаёт темп и направление, собирает пространство и ведёт посетителя по смысловым точкам.</div>
+      <ul>
+        <li>саунд-концепция, партитура, голос/тексты</li>
+        <li>пространственное звучание и аудиоточки</li>
+        <li>синхронизация с движением, светом и проекцией</li>
+      </ul>
+    `
+  },
+  ui: {
+    title: "Интерфейсы",
+    kicker: "интерактивные сценарии",
+    body: `
+      <div>Интерактивные панели, навигация и приложения, которые направляют внимание посетителя и связывают экспозицию в единый маршрут.</div>
+    `
+  },
+  graphic: {
+    title: "Графический дизайн",
+    kicker: "визуальная система проекта",
+    body: `
+      <div>Визуальная система экспозиции: типографика, схемы, носители и графика, удерживающие целостность и ритм пространства.</div>
+    `
+  },
+  vrar: {
+    title: "VR / AR",
+    kicker: "иммерсивные слои",
+    body: `
+      <div>Иммерсивные сцены и дополненные слои, расширяющие экспозицию за пределы физического пространства.</div>
+    `
+  },
+  ml: {
+    title: "ML / AI",
+    kicker: "данные и персонализация",
+    body: `
+      <div>Персонализация, интерактивные сценарии и работа с данными, реагирующие на поведение посетителей.</div>
+    `
+  }
+};
 
-    function setDir(key){
-      const d = DIR[key];
-      if (!d) return;
-
-      const idx = DIR_ORDER.indexOf(key);
-      const num = String(idx + 1).padStart(2,'0');
-
-      if (dirNum) dirNum.textContent = num;
-      if (dirTitle) dirTitle.textContent = d.title;
-      if (dirKicker) dirKicker.textContent = d.kicker;
-      if (dirBody) dirBody.innerHTML = d.body;
-
-      document.querySelectorAll('.dir-step').forEach(btn => {
-        const isActive = btn.dataset.dir === key;
-        btn.classList.toggle('is-active', isActive);
-        btn.setAttribute('aria-selected', String(isActive));
-      });
-    }
-
-    // initial
-    setDir('video');
-
-    // click navigation
-    document.querySelectorAll('.dir-step').forEach(btn => {
-      btn.addEventListener('click', () => setDir(btn.dataset.dir));
+    // ===== Directions cards (no mandatory switching) =====
+    document.querySelectorAll('.dir-mini').forEach(btn => {
+      btn.addEventListener('click', () => openOverlay(btn.dataset.dir));
     });
 
-    // wheel to switch (throttled)
-    const dirPanel = document.querySelector('.dir-panel');
-    let wheelLock = false;
-    if (dirPanel){
-      dirPanel.addEventListener('wheel', (e) => {
-        if (wheelLock) return;
-        const dy = e.deltaY || 0;
-        if (Math.abs(dy) < 10) return;
-        wheelLock = true;
-        setTimeout(() => wheelLock = false, 250);
-
-        const active = document.querySelector('.dir-step.is-active');
-        const key = active ? active.dataset.dir : 'video';
-        const i = DIR_ORDER.indexOf(key);
-        const next = dy > 0 ? Math.min(DIR_ORDER.length-1, i+1) : Math.max(0, i-1);
-        if (next !== i) setDir(DIR_ORDER[next]);
-      }, { passive: true });
-    }
-
-function openOverlay(key){
+    function openOverlay(key){
       const d = DIR[key];
       if (!d) return;
       overlayTitle.textContent = d.title;
@@ -2143,8 +2360,6 @@ function openOverlay(key){
     // ===== Contact modal =====
     const contactModal = document.getElementById('contactModal');
     const contactClose = document.getElementById('contactClose');
-    const contactCancel = document.getElementById('contactCancel');
-
     function openContact(){
       contactModal.classList.add('open');
       contactModal.setAttribute('aria-hidden','false');
@@ -2156,7 +2371,6 @@ function openOverlay(key){
 
     document.querySelectorAll('[data-open-contact]').forEach(btn => btn.addEventListener('click', openContact));
     contactClose.addEventListener('click', closeContact);
-    contactCancel.addEventListener('click', closeContact);
     contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeContact(); });
 
     document.getElementById('sendBtn')?.addEventListener('click', () => {
